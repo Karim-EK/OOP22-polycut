@@ -1,4 +1,4 @@
-package mvc.controller;
+package mvc.controller.api;
 
 /**
  * Manages the physics of the current list of sliceable on screen.

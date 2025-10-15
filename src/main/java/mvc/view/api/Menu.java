@@ -1,4 +1,4 @@
-package mvc.view;
+package mvc.view.api;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;

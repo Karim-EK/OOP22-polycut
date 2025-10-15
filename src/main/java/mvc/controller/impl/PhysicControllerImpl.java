@@ -2,10 +2,10 @@ package mvc.controller.impl;
 
 import java.util.List;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import mvc.controller.GameWorldController;
-import mvc.controller.PhysicController;
-import mvc.model.Physics;
-import mvc.model.SliceableModel;
+import mvc.controller.api.GameWorldController;
+import mvc.controller.api.PhysicController;
+import mvc.model.api.Physics;
+import mvc.model.api.SliceableModel;
 import mvc.model.impl.PhysicsImpl;
 
 /**
@@ -31,13 +31,13 @@ public class PhysicControllerImpl implements PhysicController {
      */
     @Override
     public void updateSliceablesPosition() {
-        final List<SliceableModel> currentPolygons = this.gameController.getPolygons();
+        final List<SliceableModel> currentPolygons = this.gameController.getSliceableMap();
         final List<SliceableModel> currentBombs = this.gameController.getBombs();
 
         this.physicsModel.doMaths(currentPolygons);
         this.physicsModel.doMaths(currentBombs);
 
-        this.gameController.setPolygons(currentPolygons);
+        this.gameController.updateSliceablePosition(currentPolygons);
         this.gameController.setBombs(currentBombs);
     }
 }

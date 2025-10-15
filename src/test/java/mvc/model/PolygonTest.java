@@ -2,12 +2,14 @@ package mvc.model;
 
 import org.junit.jupiter.api.Test;
 
+import mvc.model.api.SliceableTypeEnum;
+import mvc.model.impl.PolygonModel;
 import mvc.model.impl.SliceableModelImpl;
 import java.awt.geom.Point2D;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PolygonTest {
-    private final SliceableModelImpl test = new SliceableModelImpl(4, new Point2D.Double(0, 0), new Point2D.Double(10, 10), 1);
+    private final SliceableModelImpl test = new PolygonModel(SliceableTypeEnum.SQUARE, new Point2D.Double(0, 0), new Point2D.Double(10, 10), 1);
     static final double TEST_VALUE = 15;
 
     /**

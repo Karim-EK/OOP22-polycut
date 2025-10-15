@@ -1,54 +1,47 @@
 package mvc.view.impl;
 
-import mvc.view.GameScreen;
-
-import javax.swing.JFrame;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
-import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
+import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.FileInputStream;
-import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import mvc.controller.api.GameWorldController;
+import mvc.view.api.GameScreen;
+import mvc.view.api.SliceableView;
 
 /**
- * GameScreen class, it represents the PlayButton generated GUI.
+ * Rapresents the main GUI that pops out after start.
  */
 public class GameScreenImpl implements GameScreen {
-    private final LiveImpl livesLabel = new LiveImpl();
-    private final ScoreViewImpl scoreLabel = new ScoreViewImpl();
+    private static final String BACKGROUND = "background.jpg";
+    public static int SCREEN_WIDTH;
+    public static int SCREEN_HEIGHT;
+
+    private Set<SliceableView> sliceableSet;
     private final JFrame frame;
+    private MainPanel mainPanel;
+    private final GameWorldController controller;
 
-    /**
-     * GameScreen constructor.
-     */
-    public GameScreenImpl() {
+    public GameScreenImpl(GameWorldController controller) throws IOException {
+        this.controller = controller;
+        this.sliceableSet = new HashSet<>();
+
         frame = new JFrame("Polygon Cutter");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GameAreaImpl createAndShowGui() {
-        // Configuration of the Frame Behavior
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setUndecorated(true);
-        frame.setResizable(true);
 
-        // Adding control to close the frame
         frame.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(final KeyEvent e) {
@@ -69,91 +62,74 @@ public class GameScreenImpl implements GameScreen {
             }
         });
 
-        //Background
-        final var path = LiveImpl.getDeafultPath() + "background.jpg";
-        final URL url = GameScreenImpl.class.getClassLoader().getResource(path);
-        if (url != null) {
-            frame.setContentPane(new JLabel(new ImageIcon(url)));
+        final Optional<URL> url = Optional.of(GameScreenImpl.class.getClassLoader().getResource(BACKGROUND));
+        if (url.isPresent()) {
+            this.mainPanel = new MainPanel(ImageIO.read(url.get()));
+            frame.setContentPane(mainPanel);
+        } else {
+            throw new IOException();
+        }
+        SCREEN_WIDTH = this.mainPanel.getWidth();
+        SCREEN_HEIGHT = this.mainPanel.getHeight();
+    }
+
+    @Override
+    public void createAndShowGui() {
+        this.frame.setVisible(true);
+    }
+
+    @Override
+    public void addNewSliceable(SliceableView newSliceable) {
+        this.sliceableSet.add(newSliceable);
+    }
+
+    @Override
+    public void updateSliceablePosition(SliceableView sliceable, Point2D newPosition) {
+        Optional<SliceableView> targetSliceable = 
+        this.sliceableSet.stream()
+        .filter(x -> x.equals(sliceable))
+        .findAny();
+
+        if (targetSliceable.isPresent()) {
+            targetSliceable.get().setPosition(newPosition);
+        } else {
+            throw new IllegalStateException();
+        }
+        this.frame.repaint();
+    }
+
+    @Override
+    public void loseLife() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'loseLife'");
+        this.frame.repaint();
+    }
+
+    @Override
+    public void gainLife() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'gainLife'");
+        this.frame.repaint();
+    }
+
+    private class MainPanel extends JPanel {
+        private final Image bg;
+        
+        public MainPanel(Image image) {
+            this.bg = image;
         }
 
-        // Setting the main Layout of the Frame
-        frame.setLayout(new BorderLayout());
+        @Override   
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            var g2d = (Graphics2D) g;
+            var scale = Math.min(this.getWidth(), this.getHeight());
 
-        // Setting-up Lives and Score
-        final var upperPanel = new JPanel();
-        upperPanel.setLayout(new BorderLayout());
-        upperPanel.setOpaque(false);
-        frame.add(upperPanel, BorderLayout.NORTH);
+            g2d.scale(scale, scale);
+            g2d.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
 
-        // Lives on the left
-        upperPanel.add(livesLabel, BorderLayout.WEST);
-
-        // Score on the right
-        upperPanel.add(scoreLabel, BorderLayout.EAST);
-
-        //Adding the GameArea where Sliceable will be drawn
-        final var middleArea = new GameAreaImpl(this.livesLabel, this.scoreLabel);
-        frame.add(middleArea, BorderLayout.CENTER);
-        middleArea.setOpaque(false);
-
-        frame.setVisible(true);
-
-        return middleArea;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LiveImpl getCurrentLives() {
-        return this.livesLabel.getCurrLiveImpl();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getScoreValue() {
-        return this.scoreLabel.getScore();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void gameOverPanel() {
-        JOptionPane.showMessageDialog(
-                this.frame, "Game Over!\nPunteggio: " + this.scoreLabel.getScore()
-                        + "\nRecord: " + this.getCurrentBestScore());
-        this.frame.dispose();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setNewBestScore(final int record) {
-        if (record < scoreLabel.getScore()) {
-            try (BufferedWriter recordWriter = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream("record.txt"), StandardCharsets.UTF_8))) {
-                recordWriter.write(Integer.toString(scoreLabel.getScore()));
-            } catch (IOException e) {
-                return;
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
-    @Override
-    public int getCurrentBestScore() {
-        try (BufferedReader recordReader = new BufferedReader(
-                new InputStreamReader(new FileInputStream("record.txt"), StandardCharsets.UTF_8))) {
-            return Integer.parseInt(recordReader.readLine());
-        } catch (IOException | NumberFormatException e) {
-            return 0;
+            GameScreenImpl.this.sliceableSet.stream()
+            .peek(x -> g2d.drawImage(x.getImage(), (int)x.getPosition().getX(), (int)x.getPosition().getY(), this));
         }
     }
 }

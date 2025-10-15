@@ -1,7 +1,7 @@
 package mvc;
 
+import mvc.view.api.Menu;
 import mvc.view.menu.ExitButton;
-import mvc.view.Menu;
 import mvc.view.menu.PlayButton;
 import mvc.view.menu.RulesButton;
 import mvc.view.menu.SimpleMenu;

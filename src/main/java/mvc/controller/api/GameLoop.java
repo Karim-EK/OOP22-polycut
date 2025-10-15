@@ -1,6 +1,6 @@
-package mvc.controller;
+package mvc.controller.api;
 
-import mvc.view.GameArea;
+import mvc.view.api.GameArea;
 
 /**
  * GameLoop class, it controls the flow of the game.

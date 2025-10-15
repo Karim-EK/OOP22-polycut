@@ -1,12 +1,12 @@
 package mvc.view.menu;
 
-import mvc.view.Menu;
-
 import java.awt.Font;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import mvc.view.api.Menu;
 
 /**
  * MenuDecorator class models a simple menu without nothing but the screen, is used for decorate the menu with other objects.

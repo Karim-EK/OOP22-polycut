@@ -1,11 +1,11 @@
 package mvc.view.menu;
 
-import mvc.view.Menu;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import mvc.view.api.Menu;
 
 /** 
  * Creates the rules button and adds it to the menu.

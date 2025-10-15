@@ -1,6 +1,6 @@
-package mvc.model;
+package mvc.model.api;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Physics class of the project, it contains all the methods useful for
@@ -10,7 +10,7 @@ public interface Physics {
     /**
      * Mathematics method of the class, it calculates the new Point2D coordinates of velocity and
      * position in a trajectory.
-     * @param listPolygon the list of all the polygons present, in this precise moment, in the game world.
+     * @param SliceableSet the list of all the polygons present, in this precise moment, in the game world.
      */
-    void doMaths(List<SliceableModel> listPolygon);
+    void doMaths(Set<SliceableModel> SliceableSet);
 }

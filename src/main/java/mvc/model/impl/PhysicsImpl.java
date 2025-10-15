@@ -1,9 +1,10 @@
 package mvc.model.impl;
 
 import java.awt.geom.Point2D;
-import java.util.List;
-import mvc.model.Physics;
-import mvc.model.SliceableModel;
+import java.util.Set;
+
+import mvc.model.api.Physics;
+import mvc.model.api.SliceableModel;
 
 /**
  * Physics Implementation.
@@ -22,21 +23,21 @@ public class PhysicsImpl implements Physics {
 
     /**
      * {@inheritDoc}.
-     * @param listPolygon
+     * @param sliceableSet
      */
     @Override
-    public void doMaths(final List<SliceableModel> listPolygon) {
-        for (final SliceableModel poly : listPolygon) {
+    public void doMaths(final Set<SliceableModel> sliceableSet) {
+        for (final SliceableModel poly : sliceableSet) {
             final var oldPos = poly.getPosition();
             final var oldVel = poly.getVelocity();
 
-            final double velX = oldVel.getX() + dt * GRAVITY.getX();
-            final double velY = oldVel.getY() - dt * GRAVITY.getY();
-            final var newVel = new Point2D.Double(velX, velY);
+            final double velX = oldVel.x() + dt * GRAVITY.getX();
+            final double velY = oldVel.y() - dt * GRAVITY.getY();
+            final var newVel = new PositionXY((int) velX, (int) velY);
 
-            final double posX = oldPos.getX() + dt * oldVel.getX();
-            final double posY = oldPos.getY() - dt * oldVel.getY();
-            final var newPos = new Point2D.Double(posX, posY);
+            final double posX = oldPos.x() + dt * oldVel.x();
+            final double posY = oldPos.y() - dt * oldVel.y();
+            final var newPos = new PositionXY((int) posX, (int) posY);
 
             poly.setPosition(newPos);
             poly.setVelocity(newVel);

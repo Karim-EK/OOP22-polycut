@@ -1,13 +1,13 @@
 package mvc.view.menu;
 
-import mvc.view.Menu;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import mvc.view.api.Menu;
 
 /** 
  * Creates the exit button and adds it to the menu.

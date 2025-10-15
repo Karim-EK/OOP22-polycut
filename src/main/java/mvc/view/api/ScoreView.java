@@ -1,4 +1,4 @@
-package mvc.view;
+package mvc.view.api;
 
 /**
  * Interface that represents the Player's score.
@@ -12,7 +12,7 @@ public interface ScoreView {
     int getScore();
 
     /**
-     * Draw the new score.
+     * Draw the current score.
      */
     void drawScore();
 

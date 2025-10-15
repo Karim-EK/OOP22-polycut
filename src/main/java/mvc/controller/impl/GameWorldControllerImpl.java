@@ -1,15 +1,22 @@
 package mvc.controller.impl;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import mvc.controller.GameWorldController;
-import mvc.model.SliceableModel;
-import mvc.model.SliceableFactory;
-import mvc.model.impl.SliceableFactoryImpl;
+import mvc.controller.api.GameWorldController;
+import mvc.model.api.SliceableModelFactory;
+import mvc.model.api.SliceableModel;
+import mvc.model.impl.SliceableModelFactoryImpl;
 import mvc.view.impl.GameScreenImpl;
+import mvc.view.api.SliceableView;
+import mvc.view.api.SliceableFactoryView;
+import mvc.view.impl.SliceableFactoryViewImpl;;
+
 
 /**
  * Implementation class of the GameWorld controller.
@@ -17,122 +24,43 @@ import mvc.view.impl.GameScreenImpl;
  */
 public class GameWorldControllerImpl implements GameWorldController {
 
-    private final SliceableFactory factory;
-    private List<SliceableModel> polygons;
-    private List<SliceableModel> bombs;
+    private final SliceableModelFactory factory;
+    private final SliceableFactoryView factor;
+    private Map<SliceableModel, SliceableView> sliceableMap;
 
     /**
      * Constructor of the game world.
      */
     public GameWorldControllerImpl() {
-        this.factory = new SliceableFactoryImpl();
-        this.polygons = new ArrayList<>();
-        this.bombs = new ArrayList<>();
+        this.factory = new SliceableModelFactoryImpl();
+        this.factor = new SliceableFactoryViewImpl();
+        this.sliceableMap = new HashMap<>();
     }
 
-    /**
-     * {@inheritDoc}.
-     */
     @Override
-    public List<SliceableModel> getPolygons() {
-        return new ArrayList<>(this.polygons);
+    public Map<SliceableModel, SliceableView> getSliceableMap() {
+        return this.sliceableMap;
     }
 
-    /**
-     * {@inheritDoc}.
-     */
     @Override
-    public void setPolygons(final List<SliceableModel> updatedList) {
-        this.polygons = new ArrayList<>(updatedList);
+    public void updateSliceablePosition(Map<SliceableModel, SliceableView> sliceableMap, Point2D newPosition) {
+        // TODO: Calcola/Delega calcolo nuova posizione
     }
 
-    /**
-     * {@inheritDoc}.
-     */
     @Override
-    public List<SliceableModel> getBombs() {
-        return new ArrayList<>(this.bombs);
+    public void createSliceable() {
+        sliceableMap.put(factory.createSliceable(),null );
     }
 
-    /**
-     * {@inheritDoc}.
-     */
-    @Override
-    public void setBombs(final List<SliceableModel> updatedList) {
-        this.bombs = new ArrayList<>(updatedList);
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
-    @Override
-    public SliceableModel createPolygon(final int sliceableId) {
-        final SliceableModel polygon = factory.createPolygon(sliceableId);
-        this.polygons.add(polygon);
-        return polygon;
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
-    @Override
-    public SliceableModel createBomb(final int bombId) {
-        final SliceableModel bomb = factory.createBomb(bombId);
-        this.bombs.add(bomb);
-        return bomb;
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
     @Override
     public void startLoop() {
-        final GameScreenImpl screen = new GameScreenImpl();
-        new GameLoopImpl(this, screen);
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'startLoop'");
     }
 
-    /**
-     * Delete the sliceable object from the list by its ID.
-     * @param <T> extends SliceableModel class
-     * @param sliceables the list of sliceables
-     * @param sliceableId the ID of the sliceable
-     */
-    private <T extends SliceableModel> void deleteSliceableById(final List<T> sliceables,
-                                                                final Integer sliceableId) {
-        sliceables.removeIf(sliceable -> sliceable.getSliceableId() == sliceableId);
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
     @Override
-    public void outOfBoundDelete(final int sliceableId) {
-        deleteSliceableById(this.polygons, sliceableId);
-        deleteSliceableById(this.bombs, sliceableId);
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
-    @Override
-    public void addBomb(final SliceableModel bomb) {
-        this.bombs.add(bomb);
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
-    @Override
-    public void addPolygon(final SliceableModel polygon) {
-        this.polygons.add(polygon);
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
-    @Override
-    public List<SliceableModel> getSliceables() {
-        return Stream.concat(getPolygons().stream(), getBombs().stream())
-                .collect(Collectors.toList());
+    public void deleteSliceable(Pair<SliceableModel, SliceableView> sliceable) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteSliceable'");
     }
 }

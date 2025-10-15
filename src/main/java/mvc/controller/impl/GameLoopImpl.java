@@ -2,12 +2,12 @@ package mvc.controller.impl;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import mvc.App;
-import mvc.controller.GameLoop;
-import mvc.model.SliceableModel;
-import mvc.model.impl.PolygonImpl;
+import mvc.controller.api.GameLoop;
+import mvc.model.api.SliceableModel;
+import mvc.model.impl.PolygonModel;
+import mvc.view.api.GameArea;
 import mvc.view.impl.GameScreenImpl;
 import mvc.view.impl.LiveImpl;
-import mvc.view.GameArea;
 
 import javax.swing.Timer;
 import java.util.Random;
@@ -74,8 +74,8 @@ public class GameLoopImpl implements GameLoop {
         final double choice = RANDOM.nextDouble();
         this.setDifficulty(area);
         final int id = RANDOM.nextInt();
-        final SliceableModel sliceable = choice < PERCENTAGE ? world.createBomb(id) : this.world.createPolygon(id);
-        area.drawSliceable(sliceable.getSliceableId(), sliceable.getPosition(), sliceable.getSides());
+        final SliceableModel sliceable = choice < PERCENTAGE ? world.createBomb(id) : this.world.createSliceable(id);
+        area.drawSliceable(sliceable.getSliceableId(), sliceable.getPosition(), sliceable.getType());
     }
 
     /**
@@ -84,7 +84,7 @@ public class GameLoopImpl implements GameLoop {
     @Override
     public void redraw(final GameArea area) {
         gameOver();
-        area.getSliced().stream().forEach(i -> world.outOfBoundDelete(i));
+        area.getSliced().stream().forEach(i -> world.deleteSliceable(i));
         physics.updateSliceablesPosition();
         this.world.getSliceables().stream()
                                 .filter(SliceableModel::isOutOfBound)
@@ -92,12 +92,12 @@ public class GameLoopImpl implements GameLoop {
                                 .ifPresent(sliceable -> {
                                     area.clean(sliceable.getSliceableId());
                                     world.outOfBoundDelete(sliceable.getSliceableId());
-                                    if (sliceable instanceof PolygonImpl) {
+                                    if (sliceable instanceof PolygonModel) {
                                         this.lives.decreaseLives();
                                     }
                                 });
         this.world.getSliceables()
-                    .forEach(s -> area.updatePosition(s.getSliceableId(), s.getPosition(), s.getSides()));
+                    .forEach(s -> area.updatePosition(s.getSliceableId(), s.getPosition(), s.getType()));
     }
 
     /**
@@ -110,7 +110,7 @@ public class GameLoopImpl implements GameLoop {
         gameTimer.stop();
         redrawTimer.stop();
         screen.setNewBestScore(screen.getCurrentBestScore());
-        screen.gameOverPanel();
+        screen.displayGameOverPanel();
         App.initializeGame();
     }
 
@@ -119,7 +119,7 @@ public class GameLoopImpl implements GameLoop {
      * @param area the game area
      */
     private void setDifficulty(final GameArea area) {
-        final int score = screen.getScoreValue();
+        final int score = screen.getScore();
         boolean updateTimer = false;
 
         if (score == FIRST_LEVEL) {
