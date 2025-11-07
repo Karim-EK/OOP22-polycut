@@ -1,89 +1,85 @@
 package mvc.model.impl;
 
+import mvc.model.api.XY;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.SliceableTypeEnum;
 
 /**
- * {@inheritDoc}.
+ * {@inheritDoc}
  */
 public class SliceableModelImpl implements SliceableModel {
-    // TODO: costante come limite dello schermo ?
-    // forse gui potrebbe dire a controller di cambiare valore al model
-    private static final Integer LOWER_BOUND = 1000;
-    private PositionXY position;
-    private final SliceableTypeEnum type;
-    private PositionXY velocity;
-    private boolean gotCut;
+
+    protected final SliceableTypeEnum type;
+    protected XY<Double> positionXY;
+    protected XY<Double> velocityXY;
+    private final double apothem;
 
     /**
-     * Constructor of a regular polygon.
-     * @param type   type of Sliceable.
-     * @param position Position position of the sliceable, to update every timestep.
-     * @param velocity Position vector of the new velocity of the object.
-     * @param sliceableId the sliceable identifier.
+     * @param type of sliceable
+     * @param positionXY XY coordinates on the map
+     * @param velocityXY velocity for aeach axes
      */
-    public SliceableModelImpl(final SliceableTypeEnum type, final PositionXY position,
-                              final PositionXY velocity) {
-        this.velocity = new PositionXY(velocity.x(), velocity.y());
-        this.position = new PositionXY(position.x(), position.y());
+    public SliceableModelImpl(final SliceableTypeEnum type, final XY<Double> positionXY, final XY<Double> velocityXY, double lenght) {
         this.type = type;
-        this.gotCut = false;
+        this.positionXY = positionXY;
+        this.velocityXY = velocityXY;
+        this.apothem = new ShapeImpl(type, lenght).getApothem();
     }
 
     /**
-     * {@inheritDoc}.
+     * {@inheritDoc}
      */
     @Override
-    public PositionXY getPosition() {
-        return this.position;
+    public XY<Double> getPosition() {
+        return positionXY;
     }
 
     /**
-     * {@inheritDoc}.
+     * {@inheritDoc}
      */
     @Override
-    public void setPosition(final PositionXY position) {
-        this.position = position;
+    public void setPosition(final XY<Double> position) {
+        this.positionXY = position;
     }
 
     /**
-     * {@inheritDoc}.
+     * {@inheritDoc}
      */
     @Override
-    public PositionXY getVelocity() {
-        return this.velocity;
+    public XY<Double> getVelocity() {
+        return this.velocityXY;
     }
 
     /**
-     * {@inheritDoc}.
+     * {@inheritDoc}
      */
     @Override
-    public void setVelocity(final PositionXY velocity) {
-        this.velocity = velocity;
+    public void setVelocity(final XY<Double> velocity) {
+        this.velocityXY = velocity;
     }
-
+    
     /**
-     * {@inheritDoc}.
+     * {@inheritDoc}
      */
     @Override
     public SliceableTypeEnum getType() {
         return this.type;
     }
 
-
-    /**
-     * {@inheritDoc}.
-     */
     @Override
     public boolean isOutOfBound() {
-        return this.getPosition().y() > LOWER_BOUND;
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isOutOfBound'");
     }
 
-    /**
-     * {@inheritDoc}.
-     */
     @Override
     public boolean hasBeenCut() {
-        return this.gotCut;
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'hasBeenCut'");
+    }
+
+    @Override
+    public double getApothem() {
+        return this.apothem;
     }
 }

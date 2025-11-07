@@ -4,13 +4,13 @@ import java.util.Set;
 
 /**
  * Physics class of the project, it contains all the methods useful for
- * the update of the position and velocity of the polygons and bombs.
+ * the update of the position and velocity of Sliceables.
  */
 public interface Physics {
     /**
-     * Mathematics method of the class, it calculates the new Point2D coordinates of velocity and
-     * position in a trajectory.
-     * @param SliceableSet the list of all the polygons present, in this precise moment, in the game world.
+     * It calculates the new Point2D coordinates of velocity and position in a trajectory.
+     * @param SliceableSet the set of all the Sliceable present, in this precise moment, in the game world.
+     * @param deltatime time passed from the last update
      */
-    void doMaths(Set<SliceableModel> SliceableSet);
+    void updatePhysics(Set<SliceableModel> SliceableSet, double deltaTime);
 }

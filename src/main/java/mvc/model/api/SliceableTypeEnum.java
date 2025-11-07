@@ -7,34 +7,25 @@ public enum SliceableTypeEnum {
     /**
      * 3 sides.
      */
-    TRIANGLE(0.1625),
+    TRIANGLE,
     /**
      * 4 sides.
      */
-    SQUARE(0.1625),
+    SQUARE,
     /**
      * 5 sides.
      */
-    PENTAGON(0.1625),
+    PENTAGON,
     /**
      * 6 sides.
      */
-    HEXAGON(0.1625),
+    HEXAGON,
     /**
      * Bomb.
      */
-    BOMB(0.25),
+    BOMB,
     /**
      * PowerUps
      */
-    POWERUP(0.1),;
-    
-    private final double probability;
-    SliceableTypeEnum(double probability) {
-        this.probability = probability;
-    }
-
-    public double getProbability() {
-        return probability;
-    }
+    POWERUP,;
 }

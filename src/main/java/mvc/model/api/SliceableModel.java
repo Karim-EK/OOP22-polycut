@@ -1,7 +1,5 @@
 package mvc.model.api;
 
-import mvc.model.impl.PositionXY;
-
 /**
  * Represents every type of Sliceable: element that can be "cutted" by the player.
  */
@@ -12,25 +10,25 @@ public interface SliceableModel {
      *
      * @return position
      */
-    PositionXY getPosition();
+    XY<Double> getPosition();
 
     /**
      * Position setter.
      * @param position updated by the physics class.
      */
-    void setPosition(PositionXY position);
+    void setPosition(XY<Double> position);
 
     /**
      * Velocity getter.
      * @return velocity
      */
-    PositionXY getVelocity();
+    XY<Double> getVelocity();
 
     /**
      * Velocity setter.
      * @param velocity updated by the physics class.
      */
-    void setVelocity(PositionXY velocity);
+    void setVelocity(XY<Double> velocity);
 
     /**
      * @return type of Sliceable
@@ -47,4 +45,8 @@ public interface SliceableModel {
      */
     boolean hasBeenCut();
 
+    /**
+     * @return apothem from logical shape
+     */
+    double getApothem();
 }

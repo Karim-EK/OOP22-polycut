@@ -1,6 +1,6 @@
-package mvc.model.impl;
+package mvc.model.api;
 
 /**
  * Simple position record to avoid using Point2D and doubles.
  */
-public record PositionXY(int x, int y) {}
+public record XY<T>(T x, T y) {}
