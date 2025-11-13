@@ -6,28 +6,31 @@ import mvc.model.api.Physics;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.XY;
 
+/**
+ * Implementation of the Physics api.
+ */
 public class PhysicsImpl implements Physics {
 
     /*
-        pixels/s**2 
+        pixels/s**2
     */
-    final static double GRAVITY = 1200.0;
+    private static final double GRAVITY = 1200.0;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     @Override
-    public void updatePhysics(Set<SliceableModel> SliceableSet, double deltaTime) {
-        for (SliceableModel sliceable : SliceableSet) {
+    public void updatePhysics(final Set<SliceableModel> sliceableSet, final double deltaTime) {
+        for (final SliceableModel sliceable : sliceableSet) {
 
-            XY<Double> velocity = sliceable.getVelocity();
-            XY<Double> position = sliceable.getPosition();
+            final XY<Double> velocity = sliceable.getVelocity();
+            final XY<Double> position = sliceable.getPosition();
 
-            double newVy = velocity.y() + GRAVITY * deltaTime;
-            double newVx = velocity.x();
+            final double newVy = velocity.y() + GRAVITY * deltaTime;
+            final double newVx = velocity.x();
 
-            double newX = position.x() + newVx * deltaTime;
-            double newY = position.y() + newVy * deltaTime;
+            final double newX = position.x() + newVx * deltaTime;
+            final double newY = position.y() + newVy * deltaTime;
 
             sliceable.setVelocity(new XY<>(newVx, newVy));
             sliceable.setPosition(new XY<>(newX, newY));

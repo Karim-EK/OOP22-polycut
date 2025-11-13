@@ -1,14 +1,16 @@
 package mvc.model.api;
 
 /**
- * Functional interface responsible of creating SliceableModel objects
+ * responsible of creating SliceableModel objects.
  */
-@FunctionalInterface
 public interface SliceableModelFactory {
 
     /**
      * Create a random Sliceable excluding PowerUps.
-     * @return new Sliceable.
+     * @param type of sliceable to create
+     * @param positionXy the coordinates to spawn the Sliceable
+     * @param velocityXy the initial velocity for the Sliceable
+     * @return new Sliceable
      */
-    public SliceableModel createSliceable(final SliceableTypeEnum type, final XY<Double> positionXY, final XY<Double> velocityXY);
+    SliceableModel createSliceable(SliceableTypeEnum type, XY<Double> positionXy, XY<Double> velocityXy);
 }

@@ -23,9 +23,9 @@ public enum PowerUpEnum {
      */
     ONE_UP(Optional.empty(), 0.1);
 
-    private Optional<Double> duration;
-    private double probability;
-    private PowerUpEnum(Optional<Double> duaration, double probability) {
+    private final Optional<Double> duration;
+    private final double probability;
+    PowerUpEnum(final Optional<Double> duaration, final double probability) {
         this.duration = duaration;
         this.probability = probability;
     }

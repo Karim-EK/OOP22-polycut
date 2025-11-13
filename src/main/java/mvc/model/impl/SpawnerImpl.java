@@ -10,22 +10,26 @@ import mvc.model.api.Spawner;
 import mvc.model.api.XY;
 
 /**
- * This class have sole task of generating properly the sliceable
+ * This class have sole task of generating properly the sliceable.
  */
 public class SpawnerImpl implements Spawner  {
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}.
      */
     @Override
-    public Optional<SliceableModel> spawn(int score, double screenWidth, double screenHeight, SliceableModelFactory factory) {
-        double startingPosition = chooseRandomX(screenWidth);
-        double shootingAngle = chooseRandomAngle(isOnLeftSide(startingPosition, screenWidth));
-        XY<Double> startingVelocity = chooseVelocity(shootingAngle, startingPosition, screenWidth, screenHeight);
-        SliceableTypeEnum type = SliceableTypeEnum.SQUARE;
-        return Optional.of(factory.createSliceable(type, new XY<>(startingPosition, 0.0), startingVelocity));
+    public Optional<SliceableModel> spawn(
+        final int score, 
+        final double screenWidth, 
+        final double screenHeight, 
+        final SliceableModelFactory factory
+        ) {
+            final double startingPosition = chooseRandomX(screenWidth);
+            final double shootingAngle = chooseRandomAngle(isOnLeftSide(startingPosition, screenWidth));
+            final XY<Double> startingVelocity = chooseVelocity(shootingAngle, startingPosition, screenWidth, screenHeight);
+            final SliceableTypeEnum type = SliceableTypeEnum.SQUARE;
+            return Optional.of(factory.createSliceable(type, new XY<>(startingPosition, 0.0), startingVelocity));
     }
-    
-    private double chooseRandomX(double screenWidth){
+    private double chooseRandomX(final double screenWidth) {
         double startingPositionX;
         do {
             startingPositionX = new Random().nextDouble(screenWidth);
@@ -33,22 +37,24 @@ public class SpawnerImpl implements Spawner  {
 
         return startingPositionX;
     }
-
-    private boolean isOnLeftSide(double position, double screenWidth) {
+    private boolean isOnLeftSide(final double position, final double screenWidth) {
         return position < screenWidth / 2;
     }
-
-    private double chooseRandomAngle(boolean left) {
-        double angle = new Random().nextDouble(15, 75);
+    private double chooseRandomAngle(final boolean left) {
+        final double angle = new Random().nextDouble(15, 75);
         return left ? Math.toRadians(angle) : Math.toRadians(angle + 90);
     }
-
-    private XY<Double> chooseVelocity(double angle, double startingX, double screenWidth, double screenHeight) {
-        double maxX = (screenWidth - startingX) / Math.cos(angle);
-        double maxY = Math.sqrt(2 * 9.81 * screenHeight) / Math.sin(angle);
-        double maxVelocity = Math.min(maxX, maxY);
-        double minVelocity = Math.sqrt(9.81 * screenHeight) / (Math.sqrt(2) * Math.sin(angle));
-        double finalVelocity = new Random().nextDouble(minVelocity, maxVelocity);
-        return new XY<>(Math.cos(angle) * finalVelocity, Math.sin(angle) * finalVelocity);
+    private XY<Double> chooseVelocity(
+        final double angle, 
+        final double startingX, 
+        final double screenWidth, 
+        final double screenHeight
+        ) {
+            final double maxX = (screenWidth - startingX) / Math.cos(angle);
+            final double maxY = Math.sqrt(2 * 9.81 * screenHeight) / Math.sin(angle);
+            final double maxVelocity = Math.min(maxX, maxY);
+            final double minVelocity = Math.sqrt(9.81 * screenHeight) / (Math.sqrt(2) * Math.sin(angle));
+            final double finalVelocity = new Random().nextDouble(minVelocity, maxVelocity);
+            return new XY<>(Math.cos(angle) * finalVelocity, Math.sin(angle) * finalVelocity);
     }
 }

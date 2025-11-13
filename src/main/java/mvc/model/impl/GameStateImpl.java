@@ -1,0 +1,117 @@
+package mvc.model.impl;
+
+import mvc.model.api.GameState;
+import mvc.model.api.GameStateEnum;
+
+/**
+ * Implementation of GameState.
+ */
+public class GameStateImpl implements GameState {
+
+    private int lives;
+    private int score;
+    private GameStateEnum gamestate;
+    private boolean invulnerability;
+    private int multiplier;
+
+    /**
+     * sets up all the fields.
+     */
+    public GameStateImpl() {
+        this.lives = 3;
+        this.score = 0;
+        this.gamestate = GameStateEnum.RUNNING;
+        this.invulnerability = false;
+        this.multiplier = 1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getScore() {
+        return this.score;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void gainScore(final int score) {
+        this.score = this.score + score * multiplier;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getLives() {
+        return this.lives;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean addLife() {
+        if (lives < 3) {
+            lives++;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void decreseLife() {
+        if (!invulnerability) {
+            this.lives = this.lives - 1;
+            if (lives == 0) {
+                this.gamestate = GameStateEnum.GAMEOVER;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasPlayerLost() {
+        return gamestate == GameStateEnum.GAMEOVER;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GameStateEnum getGameState() {
+        return gamestate;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setGameState(final GameStateEnum gameState) {
+        this.gamestate = gameState;
+    }
+
+    /**
+     * TODO.
+     * @param activate
+     */
+    public void setInvulnerability(final boolean activate) {
+        this.invulnerability = activate;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setMultiplier(final int multiplier) {
+        this.multiplier = multiplier;
+    }
+}

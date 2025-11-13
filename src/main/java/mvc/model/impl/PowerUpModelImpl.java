@@ -8,23 +8,28 @@ import mvc.model.api.SliceableTypeEnum;
 import mvc.model.api.XY;
 
 /**
- * {@inheritDoc}
+ * Implementation of SliceableModel api.
  */
 public class PowerUpModelImpl extends SliceableModelImpl implements PowerUpModel {
 
-    final PowerUpEnum powerUpType;
-    final double duration;
-    
+    private final PowerUpEnum powerUpType;
+    private final double duration;
     /**
-     * 
-     * {@inheritDoc}
+     * {@inheritDoc}.
      * @param powerUpType the type of PowerUp
      * @param duration of the PowerUp
      */
-    public PowerUpModelImpl(final SliceableTypeEnum type, final XY<Double> positionXY, final XY<Double> velocityXY, final PowerUpEnum powerUpType, final double duration, double lenght) {
-        super(type, positionXY, velocityXY, lenght);
-        this.powerUpType = powerUpType;
-        this.duration = duration;
+    public PowerUpModelImpl(
+        final SliceableTypeEnum type, 
+        final XY<Double> positionXY, 
+        final XY<Double> velocityXY, 
+        final PowerUpEnum powerUpType, 
+        final double duration, 
+        final double lenght
+        ) {
+            super(type, positionXY, velocityXY, lenght);
+            this.powerUpType = powerUpType;
+            this.duration = duration;
     }
 
     /**

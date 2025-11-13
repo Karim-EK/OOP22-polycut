@@ -5,25 +5,31 @@ import mvc.model.api.SliceableModel;
 import mvc.model.api.SliceableTypeEnum;
 
 /**
- * {@inheritDoc}
+ * Implementation of SliceableModel api.
  */
 public class SliceableModelImpl implements SliceableModel {
 
-    protected final SliceableTypeEnum type;
-    protected XY<Double> positionXY;
-    protected XY<Double> velocityXY;
+    private final SliceableTypeEnum type;
+    private XY<Double> positionXy;
+    private XY<Double> velocityXy;
     private final double apothem;
 
     /**
      * @param type of sliceable
-     * @param positionXY XY coordinates on the map
-     * @param velocityXY velocity for aeach axes
+     * @param positionXy XY coordinates on the map
+     * @param velocityXy velocity for aeach axes
+     * @param lenght of side of the sliceable
      */
-    public SliceableModelImpl(final SliceableTypeEnum type, final XY<Double> positionXY, final XY<Double> velocityXY, double lenght) {
-        this.type = type;
-        this.positionXY = positionXY;
-        this.velocityXY = velocityXY;
-        this.apothem = new ShapeImpl(type, lenght).getApothem();
+    public SliceableModelImpl(
+        final SliceableTypeEnum type, 
+        final XY<Double> positionXy, 
+        final XY<Double> velocityXy, 
+        final double lenght
+        ) {
+            this.type = type;
+            this.positionXy = positionXy;
+            this.velocityXy = velocityXy;
+            this.apothem = new ShapeImpl(type, lenght).getApothem();
     }
 
     /**
@@ -31,7 +37,7 @@ public class SliceableModelImpl implements SliceableModel {
      */
     @Override
     public XY<Double> getPosition() {
-        return positionXY;
+        return this.positionXy;
     }
 
     /**
@@ -39,7 +45,7 @@ public class SliceableModelImpl implements SliceableModel {
      */
     @Override
     public void setPosition(final XY<Double> position) {
-        this.positionXY = position;
+        this.positionXy = position;
     }
 
     /**
@@ -47,7 +53,7 @@ public class SliceableModelImpl implements SliceableModel {
      */
     @Override
     public XY<Double> getVelocity() {
-        return this.velocityXY;
+        return this.velocityXy;
     }
 
     /**
@@ -55,9 +61,8 @@ public class SliceableModelImpl implements SliceableModel {
      */
     @Override
     public void setVelocity(final XY<Double> velocity) {
-        this.velocityXY = velocity;
+        this.velocityXy = velocity;
     }
-    
     /**
      * {@inheritDoc}
      */
@@ -66,18 +71,27 @@ public class SliceableModelImpl implements SliceableModel {
         return this.type;
     }
 
+    /**
+     * TODO.
+     */
     @Override
     public boolean isOutOfBound() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isOutOfBound'");
     }
 
+    /**
+     * TODO.
+     */
     @Override
     public boolean hasBeenCut() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'hasBeenCut'");
     }
 
+    /**
+     * TODO.
+     */
     @Override
     public double getApothem() {
         return this.apothem;

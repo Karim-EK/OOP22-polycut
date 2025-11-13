@@ -1,32 +1,34 @@
 package mvc.model.api;
 
-import java.util.Optional;
-
+/**
+ * intrdace modelling the state of the game.
+ */
 public interface GameState {
     /**
-     * Score getter
+     * Score getter.
      * @return current score
      */
     int getScore();
 
     /**
-     * Score Setter
+     * Score Setter.
+     * @param score to set
      */
-    void setScore(int score);
+    void gainScore(int score);
 
     /**
-     * lives getter
+     * lives getter.
      * @return number of lives remaining
      */
     int getLives();
 
     /**
-     * @return If lives are less than 3 will add 1 live, else return false
+     * @return If lives are less than 3 will add 1 live, else return false.
      */
     boolean addLife();
 
     /**
-     * decrese by 1 number of lives
+     * decrese by 1 number of lives.
      */
     void decreseLife();
 
@@ -36,27 +38,25 @@ public interface GameState {
     boolean hasPlayerLost();
 
     /**
-     * @return True if a PowerUp is on screen
-     */
-    boolean isPowerUpOnScreen();
-
-    /**
-     * @return True if any PowerUp has been sliced and activated
-     */
-    boolean isPowerUpActive();
-
-    /**
-     * @return The type of PowerUp active, if any
-     */
-    Optional<PowerUpEnum> getActivePowerUp();
-
-    /**
      * @return the state of the game
      */
     GameStateEnum getGameState();
 
     /**
-     * set che state of the game
+     * set che state of the game.
+     * @param gameState to change the state of the application
      */
-    void setGameState(GameState gameState);
+    void setGameState(GameStateEnum gameState);
+
+    /**
+     * prevent player from losing lives.
+     * @param activate if true
+     */
+    void setInvulnerability(boolean activate);
+
+    /**
+     * multiply the score gained.
+     * @param multiplier to wich multiply the score
+     */
+    void setMultiplier(int multiplier);
 }

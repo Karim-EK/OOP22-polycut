@@ -7,7 +7,6 @@ public interface SliceableModel {
 
     /**
      * Position getter.
-     *
      * @return position
      */
     XY<Double> getPosition();

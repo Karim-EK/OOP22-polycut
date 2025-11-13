@@ -3,12 +3,12 @@ package mvc.model.api;
 import java.util.Set;
 
 /**
- * Represent the main orchestrator of the Model, it's responsable to update the game state and notify the controller
+ * Represent the main orchestrator of the Model, it's responsable to update the game state and notify the controller.
  */
 public interface GameWorld {
 
     /**
-     * for purprose of Dependency Injection pattern
+     * for purprose of Dependency Injection pattern.
      * @param physics instance of Physics
      * @param spawner instance of Spawner
      * @param sliceHandler instance of SliceHandler
@@ -16,29 +16,37 @@ public interface GameWorld {
     void initialize(Physics physics, Spawner spawner, SliceHandler sliceHandler);
 
     /**
-     * update the state of the game
+     * update the state of the game.
      * @param deltaTime refresh rate
      */
     void update(double deltaTime);
 
     /**
-     * Calls the Controller to notify the cut, it's
+     * Calls the Controller to notify the cut, it's.
      * @param cuttedSliceable the sliceable to be removed
+     * @param initialXy the point of contact with the Sliceable
+     * @param finalXy the exiting point from the Sliceable
      */
-    void registerCut(SliceableModel cuttedSliceable);
+    void registerCut(SliceableModel cuttedSliceable, XY<Double> initialXy, XY<Double> finalXy);
 
     /**
-     * @return get the Width of the playable area
+     * @return get the Width of the playable area.
      */
     double getWorldWidth();
 
     /**
-     * @return get the Height of the playable area
+     * @return get the Height of the playable area.
      */
     double getWorldHeight();
 
     /**
-     * @return All the active sliceable
+     * @return All the active sliceable.
      */
-    Set<SliceableModel> getActiveSliceable();
+    Set<SliceableModel> getActiveSliceables();
+
+    /**
+     * To prevent more than 1 powerUp to Spawn.
+     * @return true if active or on screen
+     */
+    boolean isPowerUpOnScreenOrActive();
 }

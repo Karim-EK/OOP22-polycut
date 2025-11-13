@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="10.20.1">
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\GameState.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\GameStateEnum.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\GameWorld.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\Physics.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\PowerUpEnum.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\PowerUpFactory.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\PowerUpModel.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\Shape.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\SliceableModel.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\SliceableModelFactory.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\SliceableTypeEnum.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\SliceHandler.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\Spawner.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\api\XY.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\GameStateImpl.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\GameWorldImpl.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\PhysicsImpl.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\PowerUpModelImpl.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\ShapeImpl.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\SliceableModelFactoryImpl.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\SliceableModelImpl.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\SliceHandlerImpl.java">
+</file>
+<file name="C:\Java Projects\Poly-Cut\OOP22-polycut\src\main\java\mvc\model\impl\SpawnerImpl.java">
+</file>
+</checkstyle>

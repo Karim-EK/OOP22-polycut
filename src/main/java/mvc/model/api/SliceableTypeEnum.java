@@ -25,7 +25,7 @@ public enum SliceableTypeEnum {
      */
     BOMB,
     /**
-     * PowerUps
+     * PowerUps.
      */
     POWERUP,;
 }
