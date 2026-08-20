@@ -1,0 +1,13 @@
+# Directory e file di Gradle
+build/
+.gradle/
+
+# File compilati e archivi
+*.class
+*.jar
+
+# Cartelle temporanee degli IDE (VSCode, IntelliJ, Eclipse)
+.vscode/
+.idea/
+*.iml
+bin/

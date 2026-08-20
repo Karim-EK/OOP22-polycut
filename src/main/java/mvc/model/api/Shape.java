@@ -8,11 +8,4 @@ public interface Shape {
      * @return the apothem or just the radius of the Shape
      */
     double getApothem();
-
-    /**
-     * get the lenght of wich the Shapes are represented.
-     * @return the lengh of the radius or side
-     */
-    double getLenght();
-
 }

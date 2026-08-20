@@ -1,6 +1,7 @@
 package mvc.model.impl;
 
 import mvc.model.api.XY;
+
 import mvc.model.api.SliceableModel;
 import mvc.model.api.SliceableTypeEnum;
 
@@ -9,28 +10,30 @@ import mvc.model.api.SliceableTypeEnum;
  */
 public class SliceableModelImpl implements SliceableModel {
 
+    public static final double LENGHT = 5.0;
+    
     private final SliceableTypeEnum type;
     private XY<Double> positionXy;
     private XY<Double> velocityXy;
     private final double apothem;
+    private boolean toBeCut;
+
 
     /**
      * @param type of sliceable
      * @param positionXy XY coordinates on the map
      * @param velocityXy velocity for aeach axes
-     * @param lenght of side of the sliceable
      */
     public SliceableModelImpl(
         final SliceableTypeEnum type, 
         final XY<Double> positionXy, 
-        final XY<Double> velocityXy, 
-        final double lenght
-        ) {
+        final XY<Double> velocityXy) 
+        {
             this.type = type;
             this.positionXy = positionXy;
             this.velocityXy = velocityXy;
-            this.apothem = new ShapeImpl(type, lenght).getApothem();
-    }
+            this.apothem = new ShapeImpl(type, LENGHT).getApothem();
+        }
 
     /**
      * {@inheritDoc}
@@ -70,30 +73,36 @@ public class SliceableModelImpl implements SliceableModel {
     public SliceableTypeEnum getType() {
         return this.type;
     }
-
+    
     /**
-     * TODO.
-     */
-    @Override
-    public boolean isOutOfBound() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isOutOfBound'");
-    }
-
-    /**
-     * TODO.
+     * {@inheritDoc}
      */
     @Override
     public boolean hasBeenCut() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'hasBeenCut'");
+        return this.toBeCut;
     }
 
     /**
-     * TODO.
+     * {@inheritDoc}
      */
     @Override
     public double getApothem() {
         return this.apothem;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setAsCutted(boolean cutted) {
+        this.toBeCut = cutted;
+    }
+    
+    /**
+     * TODO.
+     */
+    @Override
+    public boolean isOutOfBound(double worldHeight) {
+        return (this.getPosition().y() - this.getApothem()) > worldHeight;
     }
 }

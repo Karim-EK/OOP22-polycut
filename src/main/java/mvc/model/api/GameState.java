@@ -1,7 +1,7 @@
 package mvc.model.api;
 
 /**
- * intrdace modelling the state of the game.
+ * interface modelling the state of the game.
  */
 public interface GameState {
     /**
@@ -59,4 +59,6 @@ public interface GameState {
      * @param multiplier to wich multiply the score
      */
     void setMultiplier(int multiplier);
+
+    boolean isInvulnerable();
 }

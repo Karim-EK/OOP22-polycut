@@ -5,7 +5,7 @@ import java.util.Optional;
 /**
  * Functional Interface responsable od deciding where and when to spawn Sliceables.
  */
-@FunctionalInterface
+
 public interface Spawner {
     /**
      * Decide when to spawn a Sliceable considering the user's score and the screen size,
@@ -16,5 +16,8 @@ public interface Spawner {
      * @param factory for generating the sliceable
      * @return the sliceable
      */
-    Optional<SliceableModel> spawn(int score, double screenWidth, double screenHeight, SliceableModelFactory factory);
+    Optional<SliceableModel> spawn(final int score, final int lives, final double screenWidth, 
+        final double screenHeight, final SliceableModelFactory factory, final boolean powerUpActiveOrOnScreen);
+
+    double calculateNextSpawnInterval(int score, int lives);
 }

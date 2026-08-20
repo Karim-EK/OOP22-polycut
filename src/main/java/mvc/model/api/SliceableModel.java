@@ -37,12 +37,17 @@ public interface SliceableModel {
     /**
      * @return true if the sliceable is out of the game area lower bound, false otherwise.
      */
-    boolean isOutOfBound();
+    boolean isOutOfBound(double worldHeight);
 
     /**
      * @return true if the Sliceable have been cut.
      */
     boolean hasBeenCut();
+
+    /**
+     * @param cutted true when actually cutted by player.
+     */
+    void setAsCutted(boolean cutted);
 
     /**
      * @return apothem from logical shape

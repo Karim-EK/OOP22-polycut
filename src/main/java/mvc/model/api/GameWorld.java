@@ -8,36 +8,10 @@ import java.util.Set;
 public interface GameWorld {
 
     /**
-     * for purprose of Dependency Injection pattern.
-     * @param physics instance of Physics
-     * @param spawner instance of Spawner
-     * @param sliceHandler instance of SliceHandler
-     */
-    void initialize(Physics physics, Spawner spawner, SliceHandler sliceHandler);
-
-    /**
      * update the state of the game.
      * @param deltaTime refresh rate
      */
     void update(double deltaTime);
-
-    /**
-     * Calls the Controller to notify the cut, it's.
-     * @param cuttedSliceable the sliceable to be removed
-     * @param initialXy the point of contact with the Sliceable
-     * @param finalXy the exiting point from the Sliceable
-     */
-    void registerCut(SliceableModel cuttedSliceable, XY<Double> initialXy, XY<Double> finalXy);
-
-    /**
-     * @return get the Width of the playable area.
-     */
-    double getWorldWidth();
-
-    /**
-     * @return get the Height of the playable area.
-     */
-    double getWorldHeight();
 
     /**
      * @return All the active sliceable.
@@ -49,4 +23,12 @@ public interface GameWorld {
      * @return true if active or on screen
      */
     boolean isPowerUpOnScreenOrActive();
+
+    /**
+     * adds listener for GameWord's events
+     * @param listener
+     */
+    void addListener(GameWorldListener listener);
+
+    void processSwipe(XY<Double> initialXy, XY<Double> finalXy);
 }

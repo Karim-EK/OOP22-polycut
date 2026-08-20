@@ -12,16 +12,42 @@ public class SliceHandlerImpl implements SliceHandler {
     private static final double TOLERANCE = 0.8;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}.
      */
     @Override
     public boolean isSliceLegit(final SliceableModel sliceable, final XY<Double> startingPoint, final XY<Double> endingPoint) {
-        final double a = endingPoint.y() - startingPoint.y();
-        final double b = startingPoint.x() - endingPoint.x();
-        final double c = endingPoint.x() * startingPoint.y() - startingPoint.x() * endingPoint.y();
-        final double numerator = Math.abs(a * sliceable.getPosition().x() + b * sliceable.getPosition().y() + c);
-        final double denominator = Math.sqrt(a * a + b * b);
-        final double distance = numerator / denominator;
-        return distance <= sliceable.getApothem() * TOLERANCE;
+        
+        final double ax = startingPoint.x();
+        final double ay = startingPoint.y();
+        final double bx = endingPoint.x();
+        final double by = endingPoint.y();
+        final double cx = sliceable.getPosition().x();
+        final double cy = sliceable.getPosition().y();
+
+        final double abx = bx - ax;
+        final double aby = by - ay;
+
+        final double acx = cx - ax;
+        final double acy = cy - ay;
+
+        final double abLengthSquared = abx * abx + aby * aby;
+
+        if (abLengthSquared == 0) {
+            final double distanceToA = Math.sqrt(acx * acx + acy * acy);
+            return distanceToA <= sliceable.getApothem() * TOLERANCE;
+        }
+
+        double t = (acx * abx + acy * aby) / abLengthSquared;
+
+        t = Math.max(0, Math.min(1, t));
+
+        final double closestPointX = ax + t * abx;
+        final double closestPointY = ay + t * aby;
+
+        final double distanceX = cx - closestPointX;
+        final double distanceY = cy - closestPointY;
+        final double distanceToSegment = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+        return distanceToSegment <= sliceable.getApothem() * TOLERANCE;
     }
 }

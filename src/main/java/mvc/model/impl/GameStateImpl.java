@@ -67,8 +67,8 @@ public class GameStateImpl implements GameState {
      */
     @Override
     public void decreseLife() {
-        if (!invulnerability) {
-            this.lives = this.lives - 1;
+        if (this.lives > 0) {
+            this.lives --;
             if (lives == 0) {
                 this.gamestate = GameStateEnum.GAMEOVER;
             }
@@ -113,5 +113,10 @@ public class GameStateImpl implements GameState {
     @Override
     public void setMultiplier(final int multiplier) {
         this.multiplier = multiplier;
+    }
+
+    @Override
+    public boolean isInvulnerable() {
+        return this.invulnerability;
     }
 }

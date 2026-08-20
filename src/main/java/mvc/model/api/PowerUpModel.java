@@ -20,4 +20,6 @@ public interface PowerUpModel extends SliceableModel {
      * @return true if it's not changhing the game state.
      */
     boolean isEnded();
+
+    public void decreaseDuration(double dt);
 }

@@ -11,53 +11,52 @@ plugins {
      * In order to create it, launch the "shadowJar" task.
      * The runnable jar will be found in build/libs/projectname-all.jar
      */
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.danilopianini.gradle-java-qa") version "1.75.0"
+    id("com.gradleup.shadow") version "9.6.1"
+    id("org.danilopianini.gradle-java-qa") version "1.191.0"
 }
 
-repositories {
+repositories { // Where to search for dependencies
     mavenCentral()
 }
 
-val javaFXModules = listOf(
-    "base",
-    "controls",
-    "fxml",
-    "swing",
-    "graphics"
-)
-
-val supportedPlatforms = listOf("linux", "mac", "win") // All required for OOP
-
 dependencies {
     // Suppressions for SpotBugs
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.6")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.3")
 
-    // Example library: Guava. Add what you need (and remove Guava if you don't use it)
-    // implementation("com.google.guava:guava:28.1-jre")
+    // Maven dependencies are composed by a group name, a name and a version, separated by colons
+    implementation("com.omertron:API-OMDB:1.5")
+    implementation("org.jooq:jool:0.9.15")
 
-    // JavaFX: comment out if you do not need them
-    val javaFxVersion = 15
-    for (platform in supportedPlatforms) {
-        for (module in javaFXModules) {
-            implementation("org.openjfx:javafx-$module:$javaFxVersion:$platform")
-        }
-    }
+    /*
+     * Simple Logging Facade for Java (SLF4J)
+     * See: http://www.slf4j.org/
+     */
+    val slf4jVersion = "2.0.18"
+    implementation("org.slf4j:slf4j-api:$slf4jVersion")
+    // Logback backend for SLF4J
+    runtimeOnly("ch.qos.logback:logback-classic:1.6.0")
 
-    val jUnitVersion = "5.11.3"
     // JUnit API and testing engine
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$jUnitVersion")
+    testImplementation(platform("org.junit:junit-bom:6.1.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
-
-tasks.withType<Test> {
-    // Enables JUnit 5 Jupiter module
-    useJUnitPlatform()
-}
-
 
 application {
-    // Define the main class for the application
+    // Define the main class for the application.
     mainClass.set("mvc.App")
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform() // Enables the engine of JUnit 5/6
+    testLogging { // Additional Options
+        // Display all events (test started, succeeded, failed...)
+        events(*org.gradle.api.tasks.testing.logging.TestLogEvent.entries.toTypedArray())
+        showStandardStreams = true // Show the standard output
+    }
+}
+
+tasks.withType<Javadoc>().configureEach {
+    isFailOnError = false
 }

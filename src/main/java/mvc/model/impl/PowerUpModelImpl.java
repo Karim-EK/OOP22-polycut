@@ -13,7 +13,7 @@ import mvc.model.api.XY;
 public class PowerUpModelImpl extends SliceableModelImpl implements PowerUpModel {
 
     private final PowerUpEnum powerUpType;
-    private final double duration;
+    private double duration;
     /**
      * {@inheritDoc}.
      * @param powerUpType the type of PowerUp
@@ -23,13 +23,11 @@ public class PowerUpModelImpl extends SliceableModelImpl implements PowerUpModel
         final SliceableTypeEnum type, 
         final XY<Double> positionXY, 
         final XY<Double> velocityXY, 
-        final PowerUpEnum powerUpType, 
-        final double duration, 
-        final double lenght
+        final PowerUpEnum powerUpType
         ) {
-            super(type, positionXY, velocityXY, lenght);
+            super(type, positionXY, velocityXY);
             this.powerUpType = powerUpType;
-            this.duration = duration;
+            this.duration = powerUpType.getDuration();
     }
 
     /**
@@ -47,13 +45,17 @@ public class PowerUpModelImpl extends SliceableModelImpl implements PowerUpModel
     public PowerUpEnum getPowerUp() {
         return this.powerUpType;
     }
+    
+    @Override
+    public void decreaseDuration(double dt) {
+        this.duration -= dt;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean isEnded() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isEnded'");
+       return this.duration <= 0;
     }
 }
