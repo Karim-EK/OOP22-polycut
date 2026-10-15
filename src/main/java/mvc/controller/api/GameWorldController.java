@@ -20,4 +20,6 @@ public interface GameWorldController {
     boolean isGameOver();
 
     int getLives();
+
+    int getScore();
 }

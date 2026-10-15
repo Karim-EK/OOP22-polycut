@@ -68,7 +68,11 @@ public class GameWorldImpl implements GameWorld {
                 deactivateCurrentPowerUp();
             }
         }
-        this.spawnTimer += deltaTime;
+        // Durante il Freeze non si generano oggetti: resterebbero fermi e invisibili sotto il bordo
+        // e alla fine del gelo partirebbero tutti insieme
+        if (gameState.getGameState() != GameStateEnum.FREEZED) {
+            this.spawnTimer += deltaTime;
+        }
         double currentSpawnInterval = spawner.calculateNextSpawnInterval(gameState.getScore(), gameState.getLives());
         if (this.spawnTimer >= currentSpawnInterval) {
             spawn();
@@ -188,5 +192,10 @@ public class GameWorldImpl implements GameWorld {
     @Override
     public int getLives() {
         return this.gameState.getLives();
+    }
+
+    @Override
+    public int getScore() {
+        return this.gameState.getScore();
     }
 }

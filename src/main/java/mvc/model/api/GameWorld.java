@@ -45,4 +45,9 @@ public interface GameWorld {
     boolean isGameover();
 
     int getLives();
+
+    /**
+     * @return the current score
+     */
+    int getScore();
 }

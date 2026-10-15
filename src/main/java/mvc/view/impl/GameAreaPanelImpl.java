@@ -5,6 +5,9 @@ import static mvc.view.impl.GameAreaHelper.createPolygon;
 import static mvc.view.impl.GameAreaHelper.drawPowerUp;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -12,6 +15,8 @@ import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
@@ -44,6 +49,13 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
     private final URL url3L = getClass().getResource("/GraphicElements/3hearts.png");
     private final URL urlBomb = getClass().getResource("/GraphicElements/bomb.png");
 
+    private static final String SCORE_FONT = "/GraphicElements/Orbitron/static/Orbitron-Bold.ttf";
+    // Dimensione del punteggio e margine, in frazione dell'altezza del pannello
+    private static final double SCORE_SIZE = 0.07;
+    private static final double SCORE_MARGIN = 0.03;
+    private static final Color SCORE_COLOR = new Color(44, 62, 80);
+
+    private Font scoreFont = new Font(Font.SANS_SERIF, Font.BOLD, 1);
     private int livesCounter;
     private GameWorldController controller;
     private Optional<XY<Double>> previousMousePosition = Optional.empty();
@@ -53,6 +65,13 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
         this.livesCounter = controller.getLives();
         if (urlBomb != null) {
             this.bombImage = Optional.of(new ImageIcon(urlBomb).getImage());
+        }
+        try (InputStream fontStream = getClass().getResourceAsStream(SCORE_FONT)) {
+            if (fontStream != null) {
+                this.scoreFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
+            }
+        } catch (final IOException | FontFormatException e) {
+            System.err.println("impossible to load the score font, using the default one");
         }
 
         try {
@@ -146,6 +165,18 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
                 g2.fillPolygon(p);
             }
         }
+
+        drawScore(g2);
+    }
+
+    // Punteggio in alto a destra, allineato al bordo destro
+    private void drawScore(final Graphics2D g) {
+        final String text = String.valueOf(this.controller.getScore());
+        final int margin = (int) Math.round(this.getHeight() * SCORE_MARGIN);
+        g.setFont(this.scoreFont.deriveFont((float) (this.getHeight() * SCORE_SIZE)));
+        final FontMetrics metrics = g.getFontMetrics();
+        g.setColor(SCORE_COLOR);
+        g.drawString(text, this.getWidth() - margin - metrics.stringWidth(text), margin + metrics.getAscent());
     }
 
     private void drawBomb(final Graphics2D g, final int cx, final int cy, final int r) {

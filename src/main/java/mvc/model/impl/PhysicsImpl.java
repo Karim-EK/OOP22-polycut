@@ -11,7 +11,7 @@ import mvc.model.api.XY;
  */
 public class PhysicsImpl implements Physics {
 
-    public static final double GRAVITY = 9.81; 
+    public static final double GRAVITY = 60.0;
 
     @Override
     public void updatePhysics(final Set<SliceableModel> sliceableSet, final double deltaTime) {

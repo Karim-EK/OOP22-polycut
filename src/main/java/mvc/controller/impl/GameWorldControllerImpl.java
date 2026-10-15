@@ -21,6 +21,7 @@ public class GameWorldControllerImpl implements GameWorldController {
 
     private volatile Set<SliceableModel> visibleSliceables;
     private volatile int lives;
+    private volatile int score;
     private volatile boolean gameOver;
 
     /**
@@ -69,9 +70,15 @@ public class GameWorldControllerImpl implements GameWorldController {
         return this.lives;
     }
 
+    @Override
+    public int getScore() {
+        return this.score;
+    }
+
     private void publishSnapshot() {
         this.visibleSliceables = Set.copyOf(this.model.getActiveSliceables());
         this.lives = this.model.getLives();
+        this.score = this.model.getScore();
         this.gameOver = this.model.isGameover();
     }
 

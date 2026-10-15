@@ -2,6 +2,7 @@ package mvc.model.impl;
 
 import mvc.model.api.SliceHandler;
 import mvc.model.api.SliceableModel;
+import mvc.model.api.SliceableTypeEnum;
 import mvc.model.api.XY;
 
 /**
@@ -10,6 +11,18 @@ import mvc.model.api.XY;
 public class SliceHandlerImpl implements SliceHandler {
 
     private static final double TOLERANCE = 0.8;
+    // Triangolo e quadrato hanno l'apotema più corto rispetto al raggio circoscritto:
+    // una tolleranza più alta rende la hitbox simile a quella delle altre forme
+    private static final double TRIANGLE_TOLERANCE = 1.2;
+    private static final double SQUARE_TOLERANCE = 0.9;
+
+    private static double toleranceOf(final SliceableTypeEnum type) {
+        return switch (type) {
+            case TRIANGLE -> TRIANGLE_TOLERANCE;
+            case SQUARE -> SQUARE_TOLERANCE;
+            default -> TOLERANCE;
+        };
+    }
 
     /**
      * {@inheritdoc}.
@@ -34,7 +47,7 @@ public class SliceHandlerImpl implements SliceHandler {
 
         if (abLengthSquared == 0) {
             final double distanceToA = Math.sqrt(acx * acx + acy * acy);
-            return distanceToA <= sliceable.getApothem() * TOLERANCE;
+            return distanceToA <= sliceable.getApothem() * toleranceOf(sliceable.getType());
         }
 
         double t = (acx * abx + acy * aby) / abLengthSquared;
@@ -48,6 +61,6 @@ public class SliceHandlerImpl implements SliceHandler {
         final double distanceY = cy - closestPointY;
         final double distanceToSegment = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
-        return distanceToSegment <= sliceable.getApothem() * TOLERANCE;
+        return distanceToSegment <= sliceable.getApothem() * toleranceOf(sliceable.getType());
     }
 }
