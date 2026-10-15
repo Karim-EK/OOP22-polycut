@@ -4,12 +4,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import mvc.model.api.GameState;
 import mvc.model.api.GameStateEnum;
 import mvc.model.api.GameWorldListener;
 import mvc.model.api.GameWorld;
 import mvc.model.api.Physics;
+import mvc.model.api.PowerUpEnum;
 import mvc.model.api.PowerUpModel;
 import mvc.model.api.SliceHandler;
 import mvc.model.api.SliceableModel;
@@ -31,6 +33,7 @@ public class GameWorldImpl implements GameWorld {
     private SliceableModelFactory factory;
     private Optional<PowerUpModel> activePowerUp;
     private Set<GameWorldListener> listeners = new HashSet<>();
+    private boolean gameOverNotified;
 
     /**
      * creates all the needed objects.
@@ -91,6 +94,7 @@ public class GameWorldImpl implements GameWorld {
                 iterator.remove();
             }
         }
+        checkGameOver();
     }
 
     public void processSwipe(XY<Double> initialXy, XY<Double> finalXy) {
@@ -108,11 +112,25 @@ public class GameWorldImpl implements GameWorld {
                 } else {
                     gameState.gainScore(1);
                 }
-                // OSSERVATORE: Notifica la View del taglio!
-                for (GameWorldListener listener : listeners) {
-                    listener.onSliceableCut(sliceable);
-                }
+                // OSSERVATORE: notifica view e audio del taglio
+                notifyListeners(listener -> listener.onSliceableCut(sliceable));
             }
+        }
+        checkGameOver();
+    }
+
+    // Il game over si notifica una sola volta, quando le vite arrivano a 0
+    private void checkGameOver() {
+        if (gameState.hasPlayerLost() && !this.gameOverNotified) {
+            this.gameOverNotified = true;
+            final int finalScore = gameState.getScore();
+            notifyListeners(listener -> listener.onGameOver(finalScore));
+        }
+    }
+
+    private void notifyListeners(final Consumer<GameWorldListener> event) {
+        for (final GameWorldListener listener : this.listeners) {
+            event.accept(listener);
         }
     }
 
@@ -159,10 +177,12 @@ public class GameWorldImpl implements GameWorld {
             default:
                 throw new IllegalStateException("powerup not excepted");
         }
+        notifyListeners(listener -> listener.onPowerUpActivate(powerup.getPowerUp()));
     }
 
     private void deactivateCurrentPowerUp() {
-        switch (activePowerUp.get().getPowerUp()) {
+        final PowerUpEnum ended = activePowerUp.get().getPowerUp();
+        switch (ended) {
             case SAFE_ZONE:
                 this.gameState.setInvulnerability(false);
                 break;
@@ -176,6 +196,7 @@ public class GameWorldImpl implements GameWorld {
                 break;
         }
         this.activePowerUp = Optional.empty();
+        notifyListeners(listener -> listener.onPowerUpDeactivate(ended));
     }
 
     @Override

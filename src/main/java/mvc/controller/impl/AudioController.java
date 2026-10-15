@@ -1,45 +1,58 @@
 package mvc.controller.impl;
 
-import mvc.model.api.GameWorldListener;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Optional;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
+import mvc.controller.api.AudioManager;
 import mvc.model.api.PowerUpEnum;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.SliceableTypeEnum;
 
-import java.net.URL;
+/**
+ * Implementation of AudioManager with javax.sound Clips loaded from the resources.
+ * A missing or broken file only disables its own sound: the game keeps working.
+ */
+public class AudioController implements AudioManager {
+    private final Optional<Clip> bgMusic;
+    private final Optional<Clip> slashSound;
+    private final Optional<Clip> explosionSound;
+    private final Optional<Clip> freezeSound;
+    private final Optional<Clip> x2Sound;
+    private final Optional<Clip> oneUpSound;
+    private final Optional<Clip> safeZoneSound;
+    private final Optional<Clip> deactivateSound;
+    private final Optional<Clip> gameOverSound;
+    private final Optional<Clip> clickSound;
 
-public class AudioController implements GameWorldListener {
-    private Clip bgMusic;
-    private Clip slashSound;
-    private Clip explosionSound;
-    private Clip freezeSound;
-    private Clip x2Sound;
-    private Clip oneUpSound;
-    private Clip safeZoneSound;
-    private Clip deactivateSound;
-    private Clip gameOverSound;
+    // Le opzioni si cambiano dal menu (thread di Swing) e si leggono dal game loop
+    private volatile boolean musicEnabled = true;
+    private volatile boolean effectsEnabled = true;
 
+    /**
+     * Loads every sound from /audio in the resources.
+     */
     public AudioController() {
         this.bgMusic = loadClip("/audio/background.wav");
         this.slashSound = loadClip("/audio/slash.wav");
         this.explosionSound = loadClip("/audio/explosion.wav");
-
-        this.freezeSound = loadClip("/audio/explosion.wav");
-        this.x2Sound = loadClip("/audio/explosion.wav");
-        this.oneUpSound = loadClip("/audio/explosion.wav");
-        this.safeZoneSound = loadClip("/audio/explosion.wav");
-
-        this.deactivateSound = loadClip("/audio/explosion.wav");
-        
-        if (this.bgMusic != null) {
-            this.bgMusic.loop(Clip.LOOP_CONTINUOUSLY);
-        }
+        this.freezeSound = loadClip("/audio/freeze.wav");
+        this.x2Sound = loadClip("/audio/x2.wav");
+        this.oneUpSound = loadClip("/audio/oneup.wav");
+        this.safeZoneSound = loadClip("/audio/safezone.wav");
+        this.deactivateSound = loadClip("/audio/deactivate.wav");
+        this.gameOverSound = loadClip("/audio/gameover.wav");
+        this.clickSound = loadClip("/audio/click.wav");
     }
 
     @Override
-    public void onSliceableCut(SliceableModel sliceable) {
+    public void onSliceableCut(final SliceableModel sliceable) {
         if (sliceable.getType() == SliceableTypeEnum.BOMB) {
             playSound(explosionSound);
         } else {
@@ -48,47 +61,92 @@ public class AudioController implements GameWorldListener {
     }
 
     @Override
-    public void onGameOver(int score) {
-        if (bgMusic != null) bgMusic.stop();
+    public void onGameOver(final int score) {
+        stopMusic();
         playSound(gameOverSound);
     }
 
     @Override
-    public void onPowerUpDeactivate(PowerUpEnum powerUp) {
+    public void onPowerUpDeactivate(final PowerUpEnum powerUp) {
         playSound(deactivateSound);
     }
 
     @Override
-    public void onPowerUpActivate(PowerUpEnum powerUp) {
-        if (powerUp.equals(PowerUpEnum.FREEZE)) {
-            playSound(freezeSound);
-        } else if (powerUp.equals(PowerUpEnum.ONE_UP)) {
-            playSound(oneUpSound);
-        } else if (powerUp.equals(PowerUpEnum.SAFE_ZONE)) {
-            playSound(safeZoneSound);
-        } else if (powerUp.equals(PowerUpEnum.X2)) {
-            playSound(x2Sound);
+    public void onPowerUpActivate(final PowerUpEnum powerUp) {
+        switch (powerUp) {
+            case FREEZE -> playSound(freezeSound);
+            case ONE_UP -> playSound(oneUpSound);
+            case SAFE_ZONE -> playSound(safeZoneSound);
+            case X2 -> playSound(x2Sound);
         }
     }
 
-    private Clip loadClip(String path) {
-        try {
-            URL url = getClass().getResource(path);
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
-            Clip clip = AudioSystem.getClip();
+    @Override
+    public void startMusic() {
+        if (this.musicEnabled) {
+            this.bgMusic.filter(clip -> !clip.isRunning()).ifPresent(clip -> clip.loop(Clip.LOOP_CONTINUOUSLY));
+        }
+    }
+
+    @Override
+    public void stopMusic() {
+        this.bgMusic.ifPresent(Clip::stop);
+    }
+
+    @Override
+    public void playClick() {
+        playSound(clickSound);
+    }
+
+    @Override
+    public void setMusicEnabled(final boolean enabled) {
+        this.musicEnabled = enabled;
+        if (enabled) {
+            startMusic();
+        } else {
+            stopMusic();
+        }
+    }
+
+    @Override
+    public boolean isMusicEnabled() {
+        return this.musicEnabled;
+    }
+
+    @Override
+    public void setEffectsEnabled(final boolean enabled) {
+        this.effectsEnabled = enabled;
+    }
+
+    @Override
+    public boolean isEffectsEnabled() {
+        return this.effectsEnabled;
+    }
+
+    private Optional<Clip> loadClip(final String path) {
+        final URL url = AudioController.class.getResource(path);
+        if (url == null) {
+            System.err.println("Audio non trovato: " + path);
+            return Optional.empty();
+        }
+        try (AudioInputStream audioIn = AudioSystem.getAudioInputStream(url)) {
+            final Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
-            return clip;
-        } catch (Exception e) {
+            return Optional.of(clip);
+        } catch (final UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             System.err.println("Errore caricamento audio: " + path);
-            return null;
+            return Optional.empty();
         }
     }
 
-    private void playSound(Clip clip) {
-        if (clip != null) {
-            clip.setFramePosition(0); 
-            clip.start();
+    // Riparte dall'inizio anche se il suono stava già suonando (tagli ravvicinati)
+    private void playSound(final Optional<Clip> clip) {
+        if (this.effectsEnabled) {
+            clip.ifPresent(c -> {
+                c.stop();
+                c.setFramePosition(0);
+                c.start();
+            });
         }
     }
-    
 }

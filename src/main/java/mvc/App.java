@@ -1,6 +1,8 @@
 package mvc;
 
+import mvc.controller.api.AudioManager;
 import mvc.controller.api.GameWorldController;
+import mvc.controller.impl.AudioController;
 import mvc.controller.api.GameLoop;
 import mvc.controller.impl.GameLoopImpl;
 import mvc.controller.impl.GameWorldControllerImpl;
@@ -22,6 +24,9 @@ public class App {
         GameWorldController controller = new GameWorldControllerImpl(model);
         GameFrameImpl gameframe = new GameFrameImpl(controller);
         model.addListener(gameframe.getGameArea());
+        final AudioManager audio = new AudioController();
+        model.addListener(audio);
+        audio.startMusic();
         gameframe.setVisible(true);
         GameLoop gameLoop = new GameLoopImpl(controller, gameframe.getGameArea());
         Thread loopThread = new Thread(gameLoop);

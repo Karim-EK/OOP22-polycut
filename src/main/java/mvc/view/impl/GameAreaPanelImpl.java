@@ -195,21 +195,21 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
 
     @Override
     public void onSliceableCut(SliceableModel sliceable) {
-        System.out.println("Evento ricevuto: ...");
+        // Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager
     }
 
     @Override
     public void onPowerUpActivate(PowerUpEnum powerUp) {
-        System.out.println("Evento ricevuto: ...");
+        // Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager
     }
 
     @Override
     public void onPowerUpDeactivate(PowerUpEnum powerUp) {
-        System.out.println("Evento ricevuto: ...");
+        // Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager
     }
 
     @Override
     public void onGameOver(int score) {
-        System.out.println("Evento ricevuto: ...");
+        // Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager
     }
 }
