@@ -16,7 +16,7 @@ public class ShapeImpl implements Shape {
 
     private double calculateApothem() {
         return switch (this.type) {
-            case POWERUP, BOMB -> this.length; // In questo caso length rappresenta il Raggio
+            case POWERUP, BOMB -> this.length;
             case TRIANGLE -> calculatePolygonApothem(3);
             case SQUARE -> calculatePolygonApothem(4);
             case PENTAGON -> calculatePolygonApothem(5);
@@ -26,7 +26,6 @@ public class ShapeImpl implements Shape {
     }
 
     private double calculatePolygonApothem(int sides) {
-        // Formula esatta: L / (2 * tan(PI / N))
         return this.length / (2 * Math.tan(Math.PI / sides));
     }
 

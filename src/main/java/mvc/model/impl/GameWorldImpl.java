@@ -180,4 +180,14 @@ public class GameWorldImpl implements GameWorld {
     public void addListener(GameWorldListener listener) {
         this.listeners.add(listener);
     }
+
+    @Override
+    public boolean isGameover() {
+        return this.gameState.getGameState().equals(GameStateEnum.GAMEOVER);
+    }
+
+    @Override
+    public int getLives() {
+        return this.gameState.getLives();
+    }
 }

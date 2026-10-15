@@ -15,4 +15,8 @@ public interface GameWorldController {
     
     // Chiamato dalla View per ottenere i dati da disegnare (in Sola Lettura!)
     Set<SliceableModel> getVisibleSliceables();
+
+    boolean isGameOver();
+
+    int getLives();
 }

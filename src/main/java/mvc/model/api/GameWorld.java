@@ -31,4 +31,8 @@ public interface GameWorld {
     void addListener(GameWorldListener listener);
 
     void processSwipe(XY<Double> initialXy, XY<Double> finalXy);
+
+    boolean isGameover();
+
+    int getLives();
 }

@@ -34,4 +34,14 @@ public class GameWorldControllerImpl implements GameWorldController {
     public Set<SliceableModel> getVisibleSliceables() {
         return new HashSet<>(this.model.getActiveSliceables());
     }
+
+    @Override
+    public boolean isGameOver() {
+        return model.isGameover();
+    }
+
+    @Override
+    public int getLives() {
+        return this.model.getLives();
+    }
 }

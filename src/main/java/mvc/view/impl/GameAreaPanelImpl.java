@@ -1,6 +1,5 @@
 package mvc.view.impl;
 
-import static mvc.model.impl.SliceableModelImpl.LENGHT;
 import static mvc.view.impl.GameAreaHelper.createPolygon;
 import static mvc.view.impl.GameAreaHelper.drawCenteredOval;
 
@@ -20,6 +19,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import mvc.controller.api.GameWorldController;
+import mvc.controller.impl.GameWorldControllerImpl;
 import mvc.model.api.GameWorldListener;
 import mvc.model.api.PowerUpEnum;
 import mvc.model.api.SliceableModel;
@@ -37,24 +37,22 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
     private Image image3L;
     
     private final URL urlBg = getClass().getResource("/GraphicElements/background.jpg");
-    private final URL url1L = getClass().getResource("/GraphicElements/hearth.png");
+    private final URL url1L = getClass().getResource("/GraphicElements/heart.png");
     private final URL url2L = getClass().getResource("/GraphicElements/2hearts.png");
     private final URL url3L = getClass().getResource("/GraphicElements/3hearts.png");
     
-    private final Set<SliceableModel> visibleSliceables;
-    
-    private static final int ONE_LIVE = 1;
-    private static final int TWO_LIVES = 2;
-    private static final int THREE_LIVES = 3;
+    private Set<SliceableModel> visibleSliceables;
     
     private int livesCounter;
+    private GameWorldController controller;
     private final Predicate<SliceableModel> circlePredicate = s -> 
         s.getType() == SliceableTypeEnum.POWERUP || s.getType() == SliceableTypeEnum.BOMB;
     private Optional<XY<Double>> previousMousePosition = Optional.empty();
 
     public GameAreaPanelImpl(GameWorldController controller) {
-        this.livesCounter = THREE_LIVES;
-        
+        this.controller = controller;
+        this.livesCounter = controller.getLives();
+
         try {
             if (urlBg == null) throw new IllegalStateException("impossible to load background");
             background = Optional.of(new ImageIcon(urlBg).getImage());
@@ -71,46 +69,55 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
         }
         
         MouseAdapter mouseAdapter = new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                previousMousePosition = Optional.of(new XY<>((double) e.getX(), (double) e.getY()));
-            }
+    public void mousePressed(MouseEvent e) {
+        previousMousePosition = Optional.of(new XY<>((double) e.getX(), (double) e.getY()));
+    }
 
-            public void mouseDragged(MouseEvent e) {
-                if (previousMousePosition != null) {
-                    XY<Double> currentMousePosition = new XY<>((double) e.getX(), (double) e.getY());
-                    
-                    // Per il resolution independent MVC, prima di inviare i punti al controller,
-                    // dovresti invertire la scala (da pixel a coordinate logiche).
-                    // double scaleX = (double) getWidth() / WORLD_LOGICAL_WIDTH;
-                    // XY<Double> logicalPrev = new XY<>(previousMousePosition.x() / scaleX, ...);
-                    
-                    controller.processSwipe(previousMousePosition.get(), currentMousePosition);
-                    previousMousePosition = Optional.of(currentMousePosition);
-                }
-            }
+    public void mouseDragged(MouseEvent e) {
+        if (previousMousePosition.isPresent()) {
+            double pixelX = (double) e.getX();
+            double pixelY = (double) e.getY();
+            
+            double scaleX = (double) getWidth() / GameWorldControllerImpl.WIDTH;
+            double scaleY = (double) getHeight() / GameWorldControllerImpl.HEIGHT;
+            
+            XY<Double> logicalPrev = new XY<>(
+                previousMousePosition.get().x() / scaleX, 
+                previousMousePosition.get().y() / scaleY
+            );
+            XY<Double> logicalCurrent = new XY<>(
+                pixelX / scaleX, 
+                pixelY / scaleY
+            );
+            
+            controller.processSwipe(logicalPrev, logicalCurrent);
+            
+            previousMousePosition = Optional.of(new XY<>(pixelX, pixelY));
+        }
+    }
 
-            public void mouseReleased(MouseEvent e) {
-                previousMousePosition = Optional.empty();
-            }
-        };
+    public void mouseReleased(MouseEvent e) {
+        previousMousePosition = Optional.empty();
+    }
+};
 
         this.addMouseListener(mouseAdapter);
         this.addMouseMotionListener(mouseAdapter);
-
-        this.visibleSliceables = new HashSet<>(controller.getVisibleSliceables());
     }
 
     @Override
     protected void paintComponent(final Graphics g) {
-        final double scaleX = (double) this.getWidth() / WIDTH;
-        final double scaleY = (double) this.getHeight() / HEIGHT;
+        this.livesCounter = controller.getLives();
+        this.visibleSliceables = new HashSet<>(this.controller.getVisibleSliceables());
+        final double scaleX = (double) this.getWidth() / GameWorldControllerImpl.WIDTH;
+        final double scaleY = (double) this.getHeight() / GameWorldControllerImpl.HEIGHT;
         super.paintComponent(g);
         background.ifPresent(bg -> g.drawImage(bg, 0, 0, this));
 
         final Image livesImage = switch (livesCounter) {
-            case ONE_LIVE -> image1L;
-            case TWO_LIVES -> image2L;
-            case THREE_LIVES -> image3L;
+            case 1 -> image1L;
+            case 2 -> image2L;
+            case 3 -> image3L;
             default -> throw new IllegalStateException("can't draw " + livesCounter + " lives");
         };
         
@@ -121,9 +128,14 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
         
         for (final SliceableModel s : visibleSliceables) {
             if (circlePredicate.test(s)) {
-                drawCenteredOval(g, s.getPosition(), LENGHT, scaleX, scaleY);
+                System.out.println("Frame disegnato. Elementi su schermo: " + visibleSliceables.size());
+                drawCenteredOval(g, s.getPosition(), s.getApothem(), scaleX, scaleY);
             } else {
                 final Polygon p = createPolygon(s.getType(), s.getPosition(), s.getApothem(), scaleX, scaleY);
+                System.out.println("Poligono: " + s.getType() + 
+                           " | Pos Logica: " + s.getPosition() + 
+                           " | Coordinate Pixel: x=" + p.getBounds().x + ", y=" + p.getBounds().y + 
+                           " | Dimensione Pixel: " + p.getBounds().width + "x" + p.getBounds().height);
                 g.drawPolygon(p);
                 g.fillPolygon(p);
             }
@@ -136,36 +148,22 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
     }
 
     @Override
-    public int getWidth() {
-        return this.getWidth();
-    }
-
-    @Override
-    public int getHeight() {
-        return this.getHeight();
-    }
-
-    @Override
     public void onSliceableCut(SliceableModel sliceable) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onSliceableCut'");
+        System.out.println("Evento ricevuto: ...");
     }
 
     @Override
     public void onPowerUpActivate(PowerUpEnum powerUp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onPowerUpActivate'");
+        System.out.println("Evento ricevuto: ...");
     }
 
     @Override
     public void onPowerUpDeactivate(PowerUpEnum powerUp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onPowerUpDeactivate'");
+        System.out.println("Evento ricevuto: ...");
     }
 
     @Override
     public void onGameOver(int score) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onGameOver'");
+        System.out.println("Evento ricevuto: ...");
     }
 }

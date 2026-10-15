@@ -15,8 +15,8 @@ import mvc.model.api.XY;
 public class SpawnerImpl implements Spawner  {
     private static final int SHAPE_CHANCHE = 85;
     private static final int BOMB_CHANCHE = 95;
-    private static final int CENTRAL_OFFSET = 300;
-    private static final double MARGIN = 50.0;
+    private static final int CENTRAL_OFFSET = 20;
+    private static final double MARGIN = 10.0;
     private final Random random = new Random();
     
     private static final double T_MAX = 3.0;
@@ -99,11 +99,11 @@ public class SpawnerImpl implements Spawner  {
 
         final double maxXVelocity = distanceToEdge / Math.abs(Math.cos(angle));
 
-        final double maxYVelocity = Math.sqrt(2 * 9.81 * (screenHeight * 0.8)) / Math.sin(angle);
+        final double maxYVelocity = Math.sqrt(2 * PhysicsImpl.GRAVITY * (screenHeight * 0.8)) / Math.sin(angle);
 
         final double maxVelocity = Math.min(maxXVelocity, maxYVelocity);
 
-        double minVelocity = Math.sqrt(9.81 * (screenHeight * 0.5)) / Math.sin(angle);
+        double minVelocity = Math.sqrt(PhysicsImpl.GRAVITY * (screenHeight * 0.5)) / Math.sin(angle);
 
         if (minVelocity >= maxVelocity) {
             minVelocity = maxVelocity * 0.8;

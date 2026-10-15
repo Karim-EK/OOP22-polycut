@@ -10,7 +10,7 @@ import mvc.model.api.SliceableTypeEnum;
  */
 public class SliceableModelImpl implements SliceableModel {
 
-    public static final double LENGHT = 5.0;
+    public static final double LENGTH = 5.0;
     
     private final SliceableTypeEnum type;
     private XY<Double> positionXy;
@@ -32,7 +32,7 @@ public class SliceableModelImpl implements SliceableModel {
             this.type = type;
             this.positionXy = positionXy;
             this.velocityXy = velocityXy;
-            this.apothem = new ShapeImpl(type, LENGHT).getApothem();
+            this.apothem = new ShapeImpl(type, LENGTH).getApothem();
         }
 
     /**

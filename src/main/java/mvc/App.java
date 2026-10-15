@@ -25,6 +25,7 @@ public class App {
         gameframe.setVisible(true);
         GameLoop gameLoop = new GameLoopImpl(controller, gameframe.getGameArea());
         Thread loopThread = new Thread(gameLoop);
+        gameLoop.start();
         loopThread.start();
     }
 }

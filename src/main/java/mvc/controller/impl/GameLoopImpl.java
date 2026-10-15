@@ -22,18 +22,16 @@ public class GameLoopImpl implements GameLoop {
     public void run() {
         long lastLoopTime = System.nanoTime();
         while (running) {
+            if (controller.isGameOver()) {
+                this.running = false;
+            }
             final long now = System.nanoTime();
             final long updateLength = now - lastLoopTime;
             lastLoopTime = now;
             
             // 1. Calcolo del deltaTime in secondi (fondamentale per la fisica indipendente dal framerate)
             final double delta = updateLength / 1_000_000_000.0;
-            
-            // 2. Aggiornamento Logico (Fisica, Spawner, Controller)
             this.controller.update(delta);
-            
-            // 3. Richiesta di Aggiornamento Grafico
-            // Invia il segnale all'EDT di Swing per chiamare paintComponent appena possibile
             this.viewPanel.repaint();
             
             // 4. Thread Sleep (Risparmio CPU e limitazione FPS)
