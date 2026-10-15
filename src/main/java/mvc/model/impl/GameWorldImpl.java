@@ -90,7 +90,9 @@ public class GameWorldImpl implements GameWorld {
             if (s.hasBeenCut()) {
                 iterator.remove();
             } else if (s.isOutOfBound(HEIGHT)) {
-                if (s.getType() != SliceableTypeEnum.BOMB && s.getType() != SliceableTypeEnum.POWERUP) {
+                // Con la Safe Zone attiva anche i poligoni che cadono non tolgono vite
+                if (s.getType() != SliceableTypeEnum.BOMB && s.getType() != SliceableTypeEnum.POWERUP
+                    && !gameState.isInvulnerable()) {
                     gameState.decreseLife();
                 }
                 iterator.remove();

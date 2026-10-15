@@ -31,7 +31,7 @@ public class MenuPanel extends BackgroundPanel {
         Power-up:
         - Fiocco di neve (Freeze): blocca tutto per 3 secondi.
         - Cuore (1-Up): una vita in più.
-        - Scudo (Safe Zone): per 5 secondi le bombe non tolgono vite.
+        - Scudo (Safe Zone): per 5 secondi non perdi vite, né per le bombe né per i poligoni caduti.
         - x2: punti doppi per 10 secondi.
 
         Durante la partita, ESC torna al menu.
