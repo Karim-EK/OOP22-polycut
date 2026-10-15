@@ -7,7 +7,7 @@ import javax.swing.SwingConstants;
 import mvc.controller.api.AppController;
 
 /**
- * Game over screen: final score, best score of the session, play again or back to the menu.
+ * Game over screen: final score, record of the level just played, play again or back to the menu.
  */
 public final class GameOverPanel extends BackgroundPanel {
 
@@ -18,7 +18,6 @@ public final class GameOverPanel extends BackgroundPanel {
 
     private final JLabel scoreLabel = new JLabel("", SwingConstants.CENTER);
     private final JLabel bestLabel = new JLabel("", SwingConstants.CENTER);
-    private int bestScore;
 
     /**
      * @param app the controller called by the buttons
@@ -57,10 +56,11 @@ public final class GameOverPanel extends BackgroundPanel {
      * Updates the labels with the score of the game just finished.
      *
      * @param score the final score
+     * @param record the record of the level, this game included
+     * @param newRecord true if this game set the record
      */
-    public void showScore(final int score) {
-        this.bestScore = Math.max(this.bestScore, score);
+    public void showScore(final int score, final int record, final boolean newRecord) {
         this.scoreLabel.setText("SCORE " + score);
-        this.bestLabel.setText("BEST " + this.bestScore);
+        this.bestLabel.setText(newRecord ? "NEW RECORD!" : "RECORD " + record);
     }
 }

@@ -10,6 +10,7 @@ import mvc.controller.api.GameWorldController;
 import mvc.model.api.DifficultyEnum;
 import mvc.model.api.GameWorldListener;
 import mvc.model.api.PowerUpEnum;
+import mvc.model.api.Records;
 import mvc.model.api.SliceableModel;
 import mvc.view.api.GameFrame;
 
@@ -28,6 +29,7 @@ public final class AppControllerImpl implements AppController, GameWorldListener
 
     private final GameWorldController gameController;
     private final AudioManager audio;
+    private final Records records;
     private Optional<GameFrame> view = Optional.empty();
     private Optional<GameLoop> loop = Optional.empty();
     private Optional<Thread> loopThread = Optional.empty();
@@ -36,10 +38,13 @@ public final class AppControllerImpl implements AppController, GameWorldListener
     /**
      * @param gameController the controller of the game world
      * @param audio the music and sound effects
+     * @param records the best score of every difficulty level
      */
-    public AppControllerImpl(final GameWorldController gameController, final AudioManager audio) {
+    public AppControllerImpl(final GameWorldController gameController, final AudioManager audio,
+            final Records records) {
         this.gameController = gameController;
         this.audio = audio;
+        this.records = records;
     }
 
     /**
@@ -112,32 +117,40 @@ public final class AppControllerImpl implements AppController, GameWorldListener
      * {@inheritDoc}
      */
     @Override
-    public void setMusicEnabled(final boolean enabled) {
-        this.audio.setMusicEnabled(enabled);
+    public int getRecord(final DifficultyEnum level) {
+        return this.records.getRecord(level);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isMusicEnabled() {
-        return this.audio.isMusicEnabled();
+    public void setMusicVolume(final int volume) {
+        this.audio.setMusicVolume(volume);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setEffectsEnabled(final boolean enabled) {
-        this.audio.setEffectsEnabled(enabled);
+    public int getMusicVolume() {
+        return this.audio.getMusicVolume();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isEffectsEnabled() {
-        return this.audio.isEffectsEnabled();
+    public void setEffectsVolume(final int volume) {
+        this.audio.setEffectsVolume(volume);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getEffectsVolume() {
+        return this.audio.getEffectsVolume();
     }
 
     /**
@@ -149,11 +162,14 @@ public final class AppControllerImpl implements AppController, GameWorldListener
     }
 
     /**
-     * Chiamato dal game loop quando le vite finiscono: la view mostra la schermata finale.
+     * Chiamato dal game loop quando le vite finiscono: si salva il record del livello giocato
+     * e la view mostra la schermata finale.
      */
     @Override
     public void onGameOver(final int score) {
-        this.view.ifPresent(v -> v.showGameOver(score));
+        final boolean newRecord = this.records.submit(this.difficulty, score);
+        final int record = this.records.getRecord(this.difficulty);
+        this.view.ifPresent(v -> v.showGameOver(score, record, newRecord));
     }
 
     /**

@@ -9,7 +9,12 @@ import mvc.model.api.GameWorldListener;
 public interface AudioManager extends GameWorldListener {
 
     /**
-     * Starts the background music in loop, if the music is enabled and not already playing.
+     * Highest volume; 0 means muted.
+     */
+    int MAX_VOLUME = 100;
+
+    /**
+     * Starts the background music in loop, if its volume is not 0 and it is not already playing.
      */
     void startMusic();
 
@@ -24,22 +29,22 @@ public interface AudioManager extends GameWorldListener {
     void playClick();
 
     /**
-     * @param enabled true to play the background music
+     * @param volume of the background music, from 0 (muted) to MAX_VOLUME
      */
-    void setMusicEnabled(boolean enabled);
+    void setMusicVolume(int volume);
 
     /**
-     * @return true if the background music is enabled
+     * @return the volume of the background music, from 0 to MAX_VOLUME
      */
-    boolean isMusicEnabled();
+    int getMusicVolume();
 
     /**
-     * @param enabled true to play the sound effects
+     * @param volume of the sound effects, from 0 (muted) to MAX_VOLUME
      */
-    void setEffectsEnabled(boolean enabled);
+    void setEffectsVolume(int volume);
 
     /**
-     * @return true if the sound effects are enabled
+     * @return the volume of the sound effects, from 0 to MAX_VOLUME
      */
-    boolean isEffectsEnabled();
+    int getEffectsVolume();
 }

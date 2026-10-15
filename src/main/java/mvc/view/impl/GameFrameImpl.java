@@ -40,7 +40,11 @@ public final class GameFrameImpl extends JFrame implements GameFrame {
     private final JPanel screens = new JPanel(this.cards);
     private final GameAreaPanelImpl gamePanel;
     private final GameOverPanel gameOverPanel;
+    private final MenuPanel menuPanel;
     private String currentScreen = MENU;
+    // Dimensione scelta per la finestra: si ripristina quando si esce dallo schermo intero
+    private Dimension windowSize = new Dimension(WIDTH, HEIGHT);
+    private boolean fullScreen;
 
     /**
      * Prepare the Frame to be set visible.
@@ -52,7 +56,8 @@ public final class GameFrameImpl extends JFrame implements GameFrame {
         super("Poly-Cut");
         this.gamePanel = new GameAreaPanelImpl(controller);
         this.gameOverPanel = new GameOverPanel(app);
-        this.screens.add(new MenuPanel(app), MENU);
+        this.menuPanel = new MenuPanel(app, this);
+        this.screens.add(this.menuPanel, MENU);
         this.screens.add(this.gamePanel, GAME);
         this.screens.add(this.gameOverPanel, GAME_OVER);
         this.add(this.screens);
@@ -70,7 +75,7 @@ public final class GameFrameImpl extends JFrame implements GameFrame {
         });
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setSize(WIDTH, HEIGHT);
+        this.setSize(this.windowSize);
         this.setLocationRelativeTo(null);
     }
 
@@ -103,11 +108,14 @@ public final class GameFrameImpl extends JFrame implements GameFrame {
     }
 
     /**
-     * {@inheritDoc}
+     * Il menu si aggiorna ogni volta che si apre: il record può essere cambiato con l'ultima partita.
      */
     @Override
     public void showMenu() {
-        SwingUtilities.invokeLater(() -> showScreen(MENU));
+        SwingUtilities.invokeLater(() -> {
+            this.menuPanel.refresh();
+            showScreen(MENU);
+        });
     }
 
     /**
@@ -123,11 +131,11 @@ public final class GameFrameImpl extends JFrame implements GameFrame {
      * e solo se nel frattempo il giocatore non è già tornato al menu.
      */
     @Override
-    public void showGameOver(final int score) {
+    public void showGameOver(final int score, final int record, final boolean newRecord) {
         SwingUtilities.invokeLater(() -> {
             final Timer timer = new Timer(GAME_OVER_DELAY_MS, e -> {
                 if (GAME.equals(this.currentScreen)) {
-                    this.gameOverPanel.showScore(score);
+                    this.gameOverPanel.showScore(score, record, newRecord);
                     showScreen(GAME_OVER);
                 }
             });
@@ -142,6 +150,52 @@ public final class GameFrameImpl extends JFrame implements GameFrame {
     @Override
     public void close() {
         SwingUtilities.invokeLater(() -> this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setWindowSize(final int width, final int height) {
+        SwingUtilities.invokeLater(() -> {
+            this.windowSize = new Dimension(width, height);
+            if (!this.fullScreen) {
+                this.setSize(this.windowSize);
+                this.setLocationRelativeTo(null);
+            }
+        });
+    }
+
+    /**
+     * Schermo intero "senza bordi": la finestra perde la cornice e copre tutto lo schermo.
+     * Non usa la modalità esclusiva, così le finestre di dialogo restano visibili sopra il gioco.
+     * Per togliere o rimettere la cornice la finestra va prima chiusa (dispose) e poi riaperta.
+     */
+    @Override
+    public void setFullScreen(final boolean enabled) {
+        SwingUtilities.invokeLater(() -> {
+            if (enabled == this.fullScreen) {
+                return;
+            }
+            this.fullScreen = enabled;
+            this.dispose();
+            this.setUndecorated(enabled);
+            if (enabled) {
+                this.setBounds(this.getGraphicsConfiguration().getBounds());
+            } else {
+                this.setSize(this.windowSize);
+                this.setLocationRelativeTo(null);
+            }
+            this.setVisible(true);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isFullScreen() {
+        return this.fullScreen;
     }
 
     private void showScreen(final String name) {

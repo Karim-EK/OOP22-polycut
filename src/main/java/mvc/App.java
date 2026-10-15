@@ -1,5 +1,7 @@
 package mvc;
 
+import java.nio.file.Path;
+
 import javax.swing.SwingUtilities;
 
 import mvc.controller.api.AudioManager;
@@ -11,6 +13,7 @@ import mvc.model.api.GameWorld;
 import mvc.model.impl.GameStateImpl;
 import mvc.model.impl.GameWorldImpl;
 import mvc.model.impl.PhysicsImpl;
+import mvc.model.impl.RecordsImpl;
 import mvc.model.impl.SliceHandlerImpl;
 import mvc.model.impl.SliceableModelFactoryImpl;
 import mvc.model.impl.SpawnerImpl;
@@ -21,6 +24,10 @@ import mvc.view.impl.GameFrameImpl;
  * It is the only class that knows the concrete implementations.
  */
 public final class App {
+
+    // I record si salvano nella cartella dell'utente, così restano tra una partita e l'altra
+    private static final Path RECORDS_FILE =
+        Path.of(System.getProperty("user.home"), ".polycut", "records.properties");
 
     private App() {
     }
@@ -35,7 +42,7 @@ public final class App {
         );
         final GameWorldController controller = new GameWorldControllerImpl(model);
         final AudioManager audio = new AudioController();
-        final AppControllerImpl app = new AppControllerImpl(controller, audio);
+        final AppControllerImpl app = new AppControllerImpl(controller, audio, new RecordsImpl(RECORDS_FILE));
 
         // La view si crea sul thread di Swing, come richiede la libreria
         SwingUtilities.invokeLater(() -> {

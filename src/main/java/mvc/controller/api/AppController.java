@@ -34,24 +34,30 @@ public interface AppController {
     void setDifficulty(DifficultyEnum difficulty);
 
     /**
-     * @param enabled true to play the background music
+     * @param difficulty the level
+     * @return the best score ever made at that level
      */
-    void setMusicEnabled(boolean enabled);
+    int getRecord(DifficultyEnum difficulty);
 
     /**
-     * @return true if the background music is enabled
+     * @param volume of the background music, from 0 (muted) to AudioManager.MAX_VOLUME
      */
-    boolean isMusicEnabled();
+    void setMusicVolume(int volume);
 
     /**
-     * @param enabled true to play the sound effects
+     * @return the volume of the background music
      */
-    void setEffectsEnabled(boolean enabled);
+    int getMusicVolume();
 
     /**
-     * @return true if the sound effects are enabled
+     * @param volume of the sound effects, from 0 (muted) to AudioManager.MAX_VOLUME
      */
-    boolean isEffectsEnabled();
+    void setEffectsVolume(int volume);
+
+    /**
+     * @return the volume of the sound effects
+     */
+    int getEffectsVolume();
 
     /**
      * Plays the sound of a menu button.

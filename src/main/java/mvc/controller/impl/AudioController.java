@@ -2,11 +2,13 @@ package mvc.controller.impl;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -24,6 +26,11 @@ import mvc.model.api.SliceableTypeEnum;
  */
 public final class AudioController implements AudioManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(AudioController.class);
+    // Volume iniziale: musica un po' sotto gli effetti, per sentire bene i tagli
+    private static final int DEFAULT_MUSIC_VOLUME = 70;
+    private static final int DEFAULT_EFFECTS_VOLUME = 90;
+    // Curva del volume: 40 * log10 rende il cursore più naturale all'orecchio di 20 * log10
+    private static final double DECIBEL_CURVE = 40.0;
 
     private final Optional<Clip> bgMusic;
     private final Optional<Clip> slashSound;
@@ -35,10 +42,11 @@ public final class AudioController implements AudioManager {
     private final Optional<Clip> deactivateSound;
     private final Optional<Clip> gameOverSound;
     private final Optional<Clip> clickSound;
+    private final List<Optional<Clip>> effects;
 
     // Le opzioni si cambiano dal menu (thread di Swing) e si leggono dal game loop
-    private volatile boolean musicEnabled = true;
-    private volatile boolean effectsEnabled = true;
+    private volatile int musicVolume = DEFAULT_MUSIC_VOLUME;
+    private volatile int effectsVolume = DEFAULT_EFFECTS_VOLUME;
 
     /**
      * Loads every sound from /audio in the resources.
@@ -54,6 +62,10 @@ public final class AudioController implements AudioManager {
         this.deactivateSound = loadClip("/audio/deactivate.wav");
         this.gameOverSound = loadClip("/audio/gameover.wav");
         this.clickSound = loadClip("/audio/click.wav");
+        this.effects = List.of(slashSound, explosionSound, freezeSound, x2Sound, oneUpSound,
+            safeZoneSound, deactivateSound, gameOverSound, clickSound);
+        this.bgMusic.ifPresent(clip -> applyVolume(clip, this.musicVolume));
+        this.effects.forEach(clip -> clip.ifPresent(c -> applyVolume(c, this.effectsVolume)));
     }
 
     @Override
@@ -88,7 +100,7 @@ public final class AudioController implements AudioManager {
 
     @Override
     public void startMusic() {
-        if (this.musicEnabled) {
+        if (this.musicVolume > 0) {
             this.bgMusic.filter(clip -> !clip.isRunning()).ifPresent(clip -> clip.loop(Clip.LOOP_CONTINUOUSLY));
         }
     }
@@ -103,29 +115,48 @@ public final class AudioController implements AudioManager {
         playSound(clickSound);
     }
 
+    // Con volume 0 la musica si ferma; appena il volume torna sopra 0 riparte
     @Override
-    public void setMusicEnabled(final boolean enabled) {
-        this.musicEnabled = enabled;
-        if (enabled) {
-            startMusic();
-        } else {
+    public void setMusicVolume(final int volume) {
+        this.musicVolume = clamp(volume);
+        this.bgMusic.ifPresent(clip -> applyVolume(clip, this.musicVolume));
+        if (this.musicVolume == 0) {
             stopMusic();
+        } else {
+            startMusic();
         }
     }
 
     @Override
-    public boolean isMusicEnabled() {
-        return this.musicEnabled;
+    public int getMusicVolume() {
+        return this.musicVolume;
     }
 
     @Override
-    public void setEffectsEnabled(final boolean enabled) {
-        this.effectsEnabled = enabled;
+    public void setEffectsVolume(final int volume) {
+        this.effectsVolume = clamp(volume);
+        this.effects.forEach(clip -> clip.ifPresent(c -> applyVolume(c, this.effectsVolume)));
     }
 
     @Override
-    public boolean isEffectsEnabled() {
-        return this.effectsEnabled;
+    public int getEffectsVolume() {
+        return this.effectsVolume;
+    }
+
+    private static int clamp(final int volume) {
+        return Math.max(0, Math.min(MAX_VOLUME, volume));
+    }
+
+    // Il volume si applica come guadagno in decibel: 0 dB al massimo, sempre più negativo verso 0
+    private static void applyVolume(final Clip clip, final int volume) {
+        if (!clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+            return;
+        }
+        final FloatControl gain = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        final double decibel = volume == 0
+            ? gain.getMinimum()
+            : DECIBEL_CURVE * Math.log10((double) volume / MAX_VOLUME);
+        gain.setValue((float) Math.max(gain.getMinimum(), Math.min(gain.getMaximum(), decibel)));
     }
 
     private Optional<Clip> loadClip(final String path) {
@@ -146,7 +177,7 @@ public final class AudioController implements AudioManager {
 
     // Riparte dall'inizio anche se il suono stava già suonando (tagli ravvicinati)
     private void playSound(final Optional<Clip> clip) {
-        if (this.effectsEnabled) {
+        if (this.effectsVolume > 0) {
             clip.ifPresent(c -> {
                 c.stop();
                 c.setFramePosition(0);
