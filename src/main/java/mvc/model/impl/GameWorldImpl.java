@@ -96,8 +96,11 @@ public class GameWorldImpl implements GameWorld {
                 sliceable.setAsCutted(true);
                 if (sliceable.getType() == SliceableTypeEnum.POWERUP) {
                     activatePowerUp((PowerUpModel) sliceable);
-                } else if (sliceable.getType() == SliceableTypeEnum.BOMB && !gameState.isInvulnerable()) {
-                    gameState.decreseLife();
+                } else if (sliceable.getType() == SliceableTypeEnum.BOMB) {
+                    // Con la Safe Zone attiva la bomba non toglie vite, ma non dà nemmeno punti
+                    if (!gameState.isInvulnerable()) {
+                        gameState.decreseLife();
+                    }
                 } else {
                     gameState.gainScore(1);
                 }

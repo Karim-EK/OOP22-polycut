@@ -10,7 +10,10 @@ import mvc.model.api.SliceableTypeEnum;
  */
 public class SliceableModelImpl implements SliceableModel {
 
-    public static final double LENGTH = 5.0;
+    /**
+     * Circumradius shared by every sliceable, in logical units.
+     */
+    public static final double RADIUS = 5.0;
     
     private final SliceableTypeEnum type;
     private XY<Double> positionXy;
@@ -32,7 +35,7 @@ public class SliceableModelImpl implements SliceableModel {
             this.type = type;
             this.positionXy = positionXy;
             this.velocityXy = velocityXy;
-            this.apothem = new ShapeImpl(type, LENGTH).getApothem();
+            this.apothem = new ShapeImpl(type, RADIUS).getApothem();
         }
 
     /**

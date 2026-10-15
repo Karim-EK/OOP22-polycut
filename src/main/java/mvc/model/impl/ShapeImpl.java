@@ -3,20 +3,28 @@ package mvc.model.impl;
 import mvc.model.api.Shape;
 import mvc.model.api.SliceableTypeEnum;
 
+/**
+ * Implementation of Shape. Every shape is built from the same circumradius
+ * (radius of the circumscribed circle), so all shapes have the same size on screen.
+ */
 public class ShapeImpl implements Shape {
-    private final double length;
+    private final double circumradius;
     private final double apothem;
     private final SliceableTypeEnum type;
 
-    ShapeImpl(final SliceableTypeEnum type, final double length) {
+    /**
+     * @param type of the sliceable
+     * @param circumradius radius of the circle circumscribed to the shape
+     */
+    ShapeImpl(final SliceableTypeEnum type, final double circumradius) {
         this.type = type;
-        this.length = length;
+        this.circumradius = circumradius;
         this.apothem = calculateApothem();
     }
 
     private double calculateApothem() {
         return switch (this.type) {
-            case POWERUP, BOMB -> this.length;
+            case POWERUP, BOMB -> this.circumradius;
             case TRIANGLE -> calculatePolygonApothem(3);
             case SQUARE -> calculatePolygonApothem(4);
             case PENTAGON -> calculatePolygonApothem(5);
@@ -25,8 +33,9 @@ public class ShapeImpl implements Shape {
         };
     }
 
-    private double calculatePolygonApothem(int sides) {
-        return this.length / (2 * Math.tan(Math.PI / sides));
+    // In un poligono regolare di n lati: apotema = R * cos(PI / n)
+    private double calculatePolygonApothem(final int sides) {
+        return this.circumradius * Math.cos(Math.PI / sides);
     }
 
     @Override

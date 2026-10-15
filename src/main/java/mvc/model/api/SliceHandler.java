@@ -7,7 +7,8 @@ package mvc.model.api;
 public interface SliceHandler {
     /**
      * Gets called by controller and calculate if the slice is valid.
-     * A slice is considered valid if the lenght of the cut is long about 30% of the maximum lenght of the Sliceable, at least
+     * A slice is considered valid if the segment drawn by the mouse passes close enough to the center
+     * of the Sliceable: its distance from the center must be at most the apothem times a tolerance.
      * @param sliceable to check if has been cut properly
      * @param startingPoint
      * @param endingPoint
