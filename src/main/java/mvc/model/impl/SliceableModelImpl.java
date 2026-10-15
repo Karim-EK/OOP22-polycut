@@ -14,13 +14,12 @@ public class SliceableModelImpl implements SliceableModel {
      * Circumradius shared by every sliceable, in logical units.
      */
     public static final double RADIUS = 5.0;
-    
+
     private final SliceableTypeEnum type;
     private XY<Double> positionXy;
     private XY<Double> velocityXy;
     private final double apothem;
     private boolean toBeCut;
-
 
     /**
      * @param type of sliceable
@@ -28,10 +27,9 @@ public class SliceableModelImpl implements SliceableModel {
      * @param velocityXy velocity for aeach axes
      */
     public SliceableModelImpl(
-        final SliceableTypeEnum type, 
-        final XY<Double> positionXy, 
-        final XY<Double> velocityXy) 
-        {
+        final SliceableTypeEnum type,
+        final XY<Double> positionXy,
+        final XY<Double> velocityXy) {
             this.type = type;
             this.positionXy = positionXy;
             this.velocityXy = velocityXy;
@@ -69,6 +67,7 @@ public class SliceableModelImpl implements SliceableModel {
     public void setVelocity(final XY<Double> velocity) {
         this.velocityXy = velocity;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -76,7 +75,7 @@ public class SliceableModelImpl implements SliceableModel {
     public SliceableTypeEnum getType() {
         return this.type;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -97,10 +96,10 @@ public class SliceableModelImpl implements SliceableModel {
      * {@inheritDoc}
      */
     @Override
-    public void setAsCutted(boolean cutted) {
+    public void setAsCutted(final boolean cutted) {
         this.toBeCut = cutted;
     }
-    
+
     /**
      * The sliceable is out only when it is falling and completely below the bottom edge:
      * at spawn time it is below the edge too, but it is going up.

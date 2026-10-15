@@ -27,6 +27,7 @@ public class BackgroundPanel extends JPanel {
 
     /**
      * Adds a component under the previous one, centered.
+     *
      * @param component to add
      */
     protected final void addRow(final JComponent component) {
@@ -40,7 +41,7 @@ public class BackgroundPanel extends JPanel {
     }
 
     @Override
-    protected void paintComponent(final Graphics g) {
+    protected final void paintComponent(final Graphics g) {
         super.paintComponent(g);
         UiStyle.background().ifPresent(bg -> g.drawImage(bg, 0, 0, this));
     }

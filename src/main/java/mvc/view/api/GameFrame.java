@@ -32,7 +32,13 @@ public interface GameFrame {
 
     /**
      * Shows the game over screen.
+     *
      * @param score the final score of the game
      */
     void showGameOver(int score);
+
+    /**
+     * Closes the window and the application.
+     */
+    void close();
 }

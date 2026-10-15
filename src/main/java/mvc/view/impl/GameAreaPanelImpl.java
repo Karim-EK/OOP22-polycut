@@ -29,86 +29,71 @@ import mvc.model.api.SliceableTypeEnum;
 import mvc.model.api.XY;
 import mvc.view.api.GameAreaPanel;
 
+/**
+ * The game area: background, lives, score, sliceables and the timer of the active power-up.
+ * It reads the immutable snapshot published by the controller and sends it the mouse movements.
+ */
+public final class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
 
-public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
-
-    private Optional<Image> background = Optional.empty();
-    private Optional<Image> bombImage = Optional.empty();
-
-    private Image image1L;
-    private Image image2L;
-    private Image image3L;
-    
-    private final URL urlBg = getClass().getResource("/GraphicElements/background.jpg");
-    private final URL url1L = getClass().getResource("/GraphicElements/heart.png");
-    private final URL url2L = getClass().getResource("/GraphicElements/2hearts.png");
-    private final URL url3L = getClass().getResource("/GraphicElements/3hearts.png");
-    private final URL urlBomb = getClass().getResource("/GraphicElements/bomb.png");
+    private static final long serialVersionUID = 1L;
 
     // I cuori sono un'immagine fissa alta 60 pixel: il punteggio si centra sulla stessa riga
     private static final int HEARTS_HEIGHT = 60;
     private static final float SCORE_SIZE = 40f;
     private static final int SCORE_MARGIN = 20;
 
-    private final PowerUpBadge powerUpBadge = new PowerUpBadge(UiStyle.background());
+    // Le immagini non sono serializzabili: transient, come richiede Swing per i campi dei componenti
+    private final transient Optional<Image> bombImage = loadImage("/GraphicElements/bomb.png");
+    private final transient Optional<Image> image1L = loadImage("/GraphicElements/heart.png");
+    private final transient Optional<Image> image2L = loadImage("/GraphicElements/2hearts.png");
+    private final transient Optional<Image> image3L = loadImage("/GraphicElements/3hearts.png");
 
-    private int livesCounter;
-    private GameWorldController controller;
-    private Optional<XY<Double>> previousMousePosition = Optional.empty();
+    private final transient PowerUpBadge powerUpBadge = new PowerUpBadge(UiStyle.background());
 
-    public GameAreaPanelImpl(GameWorldController controller) {
+    private final transient GameWorldController controller;
+    private transient Optional<XY<Double>> previousMousePosition = Optional.empty();
+
+    /**
+     * @param controller the controller of the game world: it gives what to draw and receives the swipes
+     */
+    public GameAreaPanelImpl(final GameWorldController controller) {
         this.controller = controller;
-        this.livesCounter = controller.getLives();
-        if (urlBomb != null) {
-            this.bombImage = Optional.of(new ImageIcon(urlBomb).getImage());
-        }
-        try {
-            if (urlBg == null) throw new IllegalStateException("impossible to load background");
-            background = Optional.of(new ImageIcon(urlBg).getImage());
-            
-            if (url1L == null || url2L == null || url3L == null) {
-                throw new IllegalStateException("impossible to load hearts image");
+
+        final MouseAdapter mouseAdapter = new MouseAdapter() {
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                previousMousePosition = Optional.of(new XY<>((double) e.getX(), (double) e.getY()));
             }
-            this.image1L = new ImageIcon(url1L).getImage();
-            this.image2L = new ImageIcon(url2L).getImage();
-            this.image3L = new ImageIcon(url3L).getImage();
-            
-        } catch (final Exception e) {
-            System.err.println(e.getMessage());
-        }
-        
-        MouseAdapter mouseAdapter = new MouseAdapter() {
-    public void mousePressed(MouseEvent e) {
-        previousMousePosition = Optional.of(new XY<>((double) e.getX(), (double) e.getY()));
-    }
 
-    public void mouseDragged(MouseEvent e) {
-        if (previousMousePosition.isPresent()) {
-            double pixelX = (double) e.getX();
-            double pixelY = (double) e.getY();
-            
-            double scaleX = (double) getWidth() / GameWorld.WIDTH;
-            double scaleY = (double) getHeight() / GameWorld.HEIGHT;
-            
-            XY<Double> logicalPrev = new XY<>(
-                previousMousePosition.get().x() / scaleX, 
-                previousMousePosition.get().y() / scaleY
-            );
-            XY<Double> logicalCurrent = new XY<>(
-                pixelX / scaleX, 
-                pixelY / scaleY
-            );
-            
-            controller.processSwipe(logicalPrev, logicalCurrent);
-            
-            previousMousePosition = Optional.of(new XY<>(pixelX, pixelY));
-        }
-    }
+            @Override
+            public void mouseDragged(final MouseEvent e) {
+                if (previousMousePosition.isPresent()) {
+                    final double pixelX = e.getX();
+                    final double pixelY = e.getY();
 
-    public void mouseReleased(MouseEvent e) {
-        previousMousePosition = Optional.empty();
-    }
-};
+                    final double scaleX = getWidth() / GameWorld.WIDTH;
+                    final double scaleY = getHeight() / GameWorld.HEIGHT;
+
+                    final XY<Double> logicalPrev = new XY<>(
+                        previousMousePosition.get().x() / scaleX,
+                        previousMousePosition.get().y() / scaleY
+                    );
+                    final XY<Double> logicalCurrent = new XY<>(
+                        pixelX / scaleX,
+                        pixelY / scaleY
+                    );
+
+                    controller.processSwipe(logicalPrev, logicalCurrent);
+
+                    previousMousePosition = Optional.of(new XY<>(pixelX, pixelY));
+                }
+            }
+
+            @Override
+            public void mouseReleased(final MouseEvent e) {
+                previousMousePosition = Optional.empty();
+            }
+        };
 
         this.addMouseListener(mouseAdapter);
         this.addMouseMotionListener(mouseAdapter);
@@ -116,18 +101,18 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
 
     @Override
     protected void paintComponent(final Graphics g) {
-        this.livesCounter = controller.getLives();
+        final int livesCounter = controller.getLives();
         final Set<SliceableModel> visibleSliceables = this.controller.getVisibleSliceables();
-        final double scaleX = (double) this.getWidth() / GameWorld.WIDTH;
-        final double scaleY = (double) this.getHeight() / GameWorld.HEIGHT;
+        final double scaleX = this.getWidth() / GameWorld.WIDTH;
+        final double scaleY = this.getHeight() / GameWorld.HEIGHT;
         super.paintComponent(g);
-        background.ifPresent(bg -> g.drawImage(bg, 0, 0, this));
+        UiStyle.background().ifPresent(bg -> g.drawImage(bg, 0, 0, this));
 
-        // Con 0 vite non si disegnano cuori: la schermata di game over arriverà in seguito
+        // Con 0 vite non si disegnano cuori: c'è la schermata di game over
         final Optional<Image> livesImage = switch (livesCounter) {
-            case 1 -> Optional.of(image1L);
-            case 2 -> Optional.of(image2L);
-            case 3 -> Optional.of(image3L);
+            case 1 -> image1L;
+            case 2 -> image2L;
+            case 3 -> image3L;
             default -> Optional.empty();
         };
 
@@ -178,28 +163,49 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
         }
     }
 
+    // Un'immagine mancante non blocca il gioco: si disegna senza
+    private static Optional<Image> loadImage(final String path) {
+        final URL url = GameAreaPanelImpl.class.getResource(path);
+        return url == null ? Optional.empty() : Optional.of(new ImageIcon(url).getImage());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void render() {
         this.repaint();
     }
 
+    /**
+     * Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager.
+     */
     @Override
-    public void onSliceableCut(SliceableModel sliceable) {
-        // Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager
+    public void onSliceableCut(final SliceableModel sliceable) {
+        // Nessuna azione
     }
 
+    /**
+     * Il timer del power-up si legge dallo snapshot del controller a ogni frame.
+     */
     @Override
-    public void onPowerUpActivate(PowerUpEnum powerUp) {
-        // Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager
+    public void onPowerUpActivate(final PowerUpEnum powerUp) {
+        // Nessuna azione
     }
 
+    /**
+     * Il timer sparisce da solo quando lo snapshot non ha più un power-up attivo.
+     */
     @Override
-    public void onPowerUpDeactivate(PowerUpEnum powerUp) {
-        // Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager
+    public void onPowerUpDeactivate(final PowerUpEnum powerUp) {
+        // Nessuna azione
     }
 
+    /**
+     * La schermata di game over la mostra la finestra, su richiesta dell'AppController.
+     */
     @Override
-    public void onGameOver(int score) {
-        // Nessun effetto grafico per ora: i suoni li gestisce l'AudioManager
+    public void onGameOver(final int score) {
+        // Nessuna azione
     }
 }

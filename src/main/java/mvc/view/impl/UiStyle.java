@@ -16,6 +16,9 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Colors, font, background and buttons shared by every screen of the game.
  */
@@ -33,6 +36,8 @@ public final class UiStyle {
      * Light color for the text on the buttons.
      */
     public static final Color LIGHT = new Color(236, 240, 241);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UiStyle.class);
 
     private static final String FONT_PATH = "/GraphicElements/Orbitron/static/Orbitron-Bold.ttf";
     private static final String BACKGROUND_PATH = "/GraphicElements/background.jpg";
@@ -63,6 +68,7 @@ public final class UiStyle {
 
     /**
      * Creates a flat button in the game style, that changes color when the mouse is over it.
+     *
      * @param text the label
      * @return the button
      */
@@ -96,7 +102,7 @@ public final class UiStyle {
                 return Font.createFont(Font.TRUETYPE_FONT, stream);
             }
         } catch (final IOException | FontFormatException e) {
-            System.err.println("impossible to load the Orbitron font, using the default one");
+            LOGGER.warn("impossible to load the Orbitron font, using the default one", e);
         }
         return new Font(Font.SANS_SERIF, Font.BOLD, 1);
     }

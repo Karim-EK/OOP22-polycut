@@ -2,6 +2,7 @@ package mvc.model.api;
 
 /**
  * Immutable picture of the active power-up, safe to pass to the view.
+ *
  * @param powerUp which power-up is active
  * @param timeLeft seconds before it ends
  */

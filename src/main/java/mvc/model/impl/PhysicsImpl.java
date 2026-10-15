@@ -9,10 +9,16 @@ import mvc.model.api.XY;
 /**
  * Implementation of the Physics api.
  */
-public class PhysicsImpl implements Physics {
+public final class PhysicsImpl implements Physics {
 
+    /**
+     * Gravity in logical units per second squared: a parabola lasts about 3 seconds.
+     */
     public static final double GRAVITY = 60.0;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updatePhysics(final Set<SliceableModel> sliceableSet, final double deltaTime) {
         for (final SliceableModel sliceable : sliceableSet) {

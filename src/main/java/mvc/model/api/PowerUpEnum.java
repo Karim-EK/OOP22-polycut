@@ -14,6 +14,7 @@ public enum PowerUpEnum {
     PowerUpEnum(final double duaration) {
         this.duration = duaration;
     }
+
     /**
      * @return duration of PowerUp.
      */

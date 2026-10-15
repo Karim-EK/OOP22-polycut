@@ -5,7 +5,19 @@ package mvc.controller.api;
  * Estende Runnable per poter essere eseguito su un Thread separato.
  */
 public interface GameLoop extends Runnable {
+
+    /**
+     * Prepares the loop to run: call it before starting the thread.
+     */
     void start();
+
+    /**
+     * Asks the loop to end at the end of the current frame.
+     */
     void stop();
+
+    /**
+     * @return true while the loop is running
+     */
     boolean isRunning();
 }

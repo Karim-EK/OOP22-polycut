@@ -7,25 +7,38 @@ public enum SliceableTypeEnum {
     /**
      * 3 sides.
      */
-    TRIANGLE,
+    TRIANGLE(3),
     /**
      * 4 sides.
      */
-    SQUARE,
+    SQUARE(4),
     /**
      * 5 sides.
      */
-    PENTAGON,
+    PENTAGON(5),
     /**
      * 6 sides.
      */
-    HEXAGON,
+    HEXAGON(6),
     /**
      * Bomb.
      */
-    BOMB,
+    BOMB(0),
     /**
      * PowerUps.
      */
-    POWERUP,;
+    POWERUP(0);
+
+    private final int sides;
+
+    SliceableTypeEnum(final int sides) {
+        this.sides = sides;
+    }
+
+    /**
+     * @return number of sides of the polygon, 0 for the round sliceables (bombs and power-ups)
+     */
+    public int getSides() {
+        return this.sides;
+    }
 }

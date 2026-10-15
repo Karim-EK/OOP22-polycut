@@ -5,6 +5,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import mvc.controller.api.GameWorldController;
 import mvc.model.api.DifficultyEnum;
 import mvc.model.api.GameWorld;
@@ -17,7 +18,7 @@ import mvc.model.api.XY;
  * The model is only touched by the game loop thread: swipes coming from the Swing thread
  * are queued and applied at the next update, while the view reads an immutable snapshot.
  */
-public class GameWorldControllerImpl implements GameWorldController {
+public final class GameWorldControllerImpl implements GameWorldController {
 
     private final GameWorld model;
     private final Queue<Swipe> pendingSwipes = new ConcurrentLinkedQueue<>();
@@ -31,6 +32,10 @@ public class GameWorldControllerImpl implements GameWorldController {
     /**
      * @param model the game world to drive
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "The controller drives the model: in MVC it must keep a reference to it"
+    )
     public GameWorldControllerImpl(final GameWorld model) {
         this.model = model;
         publishSnapshot();
@@ -56,29 +61,45 @@ public class GameWorldControllerImpl implements GameWorldController {
      */
     @Override
     public void processSwipe(final XY<Double> initialXy, final XY<Double> finalXy) {
-        this.pendingSwipes.offer(new Swipe(initialXy, finalXy));
+        // La coda non ha limiti di capienza: l'inserimento riesce sempre
+        this.pendingSwipes.add(new Swipe(initialXy, finalXy));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<SliceableModel> getVisibleSliceables() {
         return this.visibleSliceables;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isGameOver() {
         return this.gameOver;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getLives() {
         return this.lives;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getScore() {
         return this.score;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<PowerUpStatus> getActivePowerUp() {
         return this.activePowerUp;
@@ -98,12 +119,15 @@ public class GameWorldControllerImpl implements GameWorldController {
         this.visibleSliceables = Set.copyOf(this.model.getActiveSliceables());
         this.lives = this.model.getLives();
         this.score = this.model.getScore();
-        this.gameOver = this.model.isGameover();
+        this.gameOver = this.model.isGameOver();
         this.activePowerUp = this.model.getActivePowerUp();
     }
 
     /**
      * A mouse movement in logical coordinates, waiting to be applied to the model.
+     *
+     * @param from where the movement starts
+     * @param to where the movement ends
      */
     private record Swipe(XY<Double> from, XY<Double> to) { }
 }

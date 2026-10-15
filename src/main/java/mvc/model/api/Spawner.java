@@ -8,6 +8,7 @@ import java.util.List;
 public interface Spawner {
     /**
      * Creates the sliceables of the next launch: a single one, or a wave of 2-3 when the score is high enough.
+     *
      * @param score current score, makes waves more frequent
      * @param lives current lives, the 1-Up power-up is spawned only without full lives
      * @param screenWidth width of the game world

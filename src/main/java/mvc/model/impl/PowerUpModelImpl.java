@@ -10,19 +10,23 @@ import mvc.model.api.XY;
 /**
  * Implementation of SliceableModel api.
  */
-public class PowerUpModelImpl extends SliceableModelImpl implements PowerUpModel {
+public final class PowerUpModelImpl extends SliceableModelImpl implements PowerUpModel {
 
     private final PowerUpEnum powerUpType;
     private double duration;
+
     /**
-     * {@inheritDoc}.
+     * The duration starts from the one defined in PowerUpEnum.
+     *
+     * @param type of sliceable, always POWERUP
+     * @param positionXY XY coordinates on the map
+     * @param velocityXY velocity for each axes
      * @param powerUpType the type of PowerUp
-     * @param duration of the PowerUp
      */
     public PowerUpModelImpl(
-        final SliceableTypeEnum type, 
-        final XY<Double> positionXY, 
-        final XY<Double> velocityXY, 
+        final SliceableTypeEnum type,
+        final XY<Double> positionXY,
+        final XY<Double> velocityXY,
         final PowerUpEnum powerUpType
         ) {
             super(type, positionXY, velocityXY);
@@ -45,9 +49,12 @@ public class PowerUpModelImpl extends SliceableModelImpl implements PowerUpModel
     public PowerUpEnum getPowerUp() {
         return this.powerUpType;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void decreaseDuration(double dt) {
+    public void decreaseDuration(final double dt) {
         this.duration -= dt;
     }
 

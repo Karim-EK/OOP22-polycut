@@ -11,18 +11,21 @@ public interface GameState {
 
     /**
      * Score getter.
+     *
      * @return current score
      */
     int getScore();
 
     /**
      * Score Setter.
-     * @param score to set
+     *
+     * @param points to add, multiplied by the active multiplier
      */
-    void gainScore(int score);
+    void gainScore(int points);
 
     /**
      * lives getter.
+     *
      * @return number of lives remaining
      */
     int getLives();
@@ -49,22 +52,28 @@ public interface GameState {
 
     /**
      * set che state of the game.
+     *
      * @param gameState to change the state of the application
      */
     void setGameState(GameStateEnum gameState);
 
     /**
      * prevent player from losing lives.
+     *
      * @param activate if true
      */
     void setInvulnerability(boolean activate);
 
     /**
      * multiply the score gained.
+     *
      * @param multiplier to wich multiply the score
      */
     void setMultiplier(int multiplier);
 
+    /**
+     * @return true while the Safe Zone protects the player from losing lives
+     */
     boolean isInvulnerable();
 
     /**

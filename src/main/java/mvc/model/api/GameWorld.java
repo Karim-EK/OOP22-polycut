@@ -20,6 +20,7 @@ public interface GameWorld {
 
     /**
      * update the state of the game.
+     *
      * @param deltaTime refresh rate
      */
     void update(double deltaTime);
@@ -31,20 +32,34 @@ public interface GameWorld {
 
     /**
      * To prevent more than 1 powerUp to Spawn.
+     *
      * @return true if active or on screen
      */
     boolean isPowerUpOnScreenOrActive();
 
     /**
-     * adds listener for GameWord's events
-     * @param listener
+     * adds listener for GameWord's events.
+     *
+     * @param listener the observer to notify
      */
     void addListener(GameWorldListener listener);
 
+    /**
+     * Cuts every sliceable crossed by the mouse movement.
+     *
+     * @param initialXy where the movement starts, in logical coordinates
+     * @param finalXy where the movement ends, in logical coordinates
+     */
     void processSwipe(XY<Double> initialXy, XY<Double> finalXy);
 
-    boolean isGameover();
+    /**
+     * @return true if the player has no lives left
+     */
+    boolean isGameOver();
 
+    /**
+     * @return the lives of the player
+     */
     int getLives();
 
     /**
@@ -59,6 +74,7 @@ public interface GameWorld {
 
     /**
      * Clears the world and starts a new game.
+     *
      * @param difficulty the level chosen in the menu
      */
     void newGame(DifficultyEnum difficulty);

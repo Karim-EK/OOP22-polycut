@@ -9,13 +9,14 @@ import javax.swing.SwingConstants;
 
 import java.awt.GridLayout;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import mvc.controller.api.AppController;
 import mvc.model.api.DifficultyEnum;
 
 /**
  * Main menu: play, difficulty, options, rules and exit.
  */
-public class MenuPanel extends BackgroundPanel {
+public final class MenuPanel extends BackgroundPanel {
 
     private static final long serialVersionUID = 1L;
     private static final float TITLE_SIZE = 72f;
@@ -43,6 +44,10 @@ public class MenuPanel extends BackgroundPanel {
     /**
      * @param app the controller called by the buttons
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "The menu calls the application controller shared by all the screens"
+    )
     public MenuPanel(final AppController app) {
         super();
         this.app = app;

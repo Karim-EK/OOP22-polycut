@@ -7,7 +7,7 @@ import java.util.Optional;
  */
 public interface PowerUpModel extends SliceableModel {
     /**
-     * @return the time that remains until the PowerUp ends in millisecons.
+     * @return the time that remains until the PowerUp ends in seconds.
      */
     Optional<Double> getTimeReameaning();
 
@@ -21,5 +21,10 @@ public interface PowerUpModel extends SliceableModel {
      */
     boolean isEnded();
 
-    public void decreaseDuration(double dt);
+    /**
+     * Reduces the time left, called at every update while the power-up is active.
+     *
+     * @param dt seconds passed from the last update
+     */
+    void decreaseDuration(double dt);
 }

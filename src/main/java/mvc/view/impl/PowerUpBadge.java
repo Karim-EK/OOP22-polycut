@@ -48,6 +48,7 @@ public class PowerUpBadge {
 
     /**
      * Draws the badge centered at the top of the panel.
+     *
      * @param g graphics of the game area
      * @param status the active power-up
      * @param panelWidth width of the game area in pixels

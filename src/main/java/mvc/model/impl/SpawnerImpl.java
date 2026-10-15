@@ -19,7 +19,7 @@ import mvc.model.api.XY;
  * Every sliceable is launched from below the bottom edge and its parabola
  * always falls back on the bottom edge, inside the screen.
  */
-public class SpawnerImpl implements Spawner  {
+public final class SpawnerImpl implements Spawner {
     // Su 100 lanci: 82 poligoni, 10 bombe, 8 power-up
     private static final int SHAPE_CHANCHE = 82;
     private static final int BOMB_CHANCHE = 92;

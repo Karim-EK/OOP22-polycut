@@ -7,7 +7,7 @@ import mvc.model.api.SliceableTypeEnum;
  * Implementation of Shape. Every shape is built from the same circumradius
  * (radius of the circumscribed circle), so all shapes have the same size on screen.
  */
-public class ShapeImpl implements Shape {
+public final class ShapeImpl implements Shape {
     private final double circumradius;
     private final double apothem;
     private final SliceableTypeEnum type;
@@ -25,11 +25,7 @@ public class ShapeImpl implements Shape {
     private double calculateApothem() {
         return switch (this.type) {
             case POWERUP, BOMB -> this.circumradius;
-            case TRIANGLE -> calculatePolygonApothem(3);
-            case SQUARE -> calculatePolygonApothem(4);
-            case PENTAGON -> calculatePolygonApothem(5);
-            case HEXAGON -> calculatePolygonApothem(6);
-            default -> throw new IllegalArgumentException("Shape non supportata");
+            case TRIANGLE, SQUARE, PENTAGON, HEXAGON -> calculatePolygonApothem(this.type.getSides());
         };
     }
 
@@ -38,6 +34,9 @@ public class ShapeImpl implements Shape {
         return this.circumradius * Math.cos(Math.PI / sides);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double getApothem() {
         return this.apothem;

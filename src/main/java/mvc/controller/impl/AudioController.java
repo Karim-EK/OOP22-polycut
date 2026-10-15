@@ -10,6 +10,9 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import mvc.controller.api.AudioManager;
 import mvc.model.api.PowerUpEnum;
 import mvc.model.api.SliceableModel;
@@ -19,7 +22,9 @@ import mvc.model.api.SliceableTypeEnum;
  * Implementation of AudioManager with javax.sound Clips loaded from the resources.
  * A missing or broken file only disables its own sound: the game keeps working.
  */
-public class AudioController implements AudioManager {
+public final class AudioController implements AudioManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AudioController.class);
+
     private final Optional<Clip> bgMusic;
     private final Optional<Clip> slashSound;
     private final Optional<Clip> explosionSound;
@@ -126,7 +131,7 @@ public class AudioController implements AudioManager {
     private Optional<Clip> loadClip(final String path) {
         final URL url = AudioController.class.getResource(path);
         if (url == null) {
-            System.err.println("Audio non trovato: " + path);
+            LOGGER.warn("Audio non trovato: {}", path);
             return Optional.empty();
         }
         try (AudioInputStream audioIn = AudioSystem.getAudioInputStream(url)) {
@@ -134,7 +139,7 @@ public class AudioController implements AudioManager {
             clip.open(audioIn);
             return Optional.of(clip);
         } catch (final UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.err.println("Errore caricamento audio: " + path);
+            LOGGER.warn("Errore caricamento audio: {}", path, e);
             return Optional.empty();
         }
     }

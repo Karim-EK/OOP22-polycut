@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -14,6 +15,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import mvc.controller.api.AppController;
 import mvc.controller.api.GameWorldController;
 import mvc.view.api.GameAreaPanel;
@@ -22,7 +24,7 @@ import mvc.view.api.GameFrame;
 /**
  * The main window. A CardLayout shows one screen at a time: menu, game or game over.
  */
-public class GameFrameImpl extends JFrame implements GameFrame {
+public final class GameFrameImpl extends JFrame implements GameFrame {
 
     private static final long serialVersionUID = 1L;
     private static final int WIDTH = 1280;
@@ -42,6 +44,7 @@ public class GameFrameImpl extends JFrame implements GameFrame {
 
     /**
      * Prepare the Frame to be set visible.
+     *
      * @param controller the controller of the game world, used by the game area
      * @param app the controller of the application flow, used by the buttons
      */
@@ -71,40 +74,61 @@ public class GameFrameImpl extends JFrame implements GameFrame {
         this.setLocationRelativeTo(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getScreenWidth() {
         return this.screen.width;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getScreenHeight() {
         return this.screen.height;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "The game loop needs the real game area to redraw it at every frame"
+    )
     public GameAreaPanel getGameArea() {
         return this.gamePanel;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void showMenu() {
-        SwingUtilities.invokeLater(() -> show(MENU));
+        SwingUtilities.invokeLater(() -> showScreen(MENU));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void showGame() {
-        SwingUtilities.invokeLater(() -> show(GAME));
+        SwingUtilities.invokeLater(() -> showScreen(GAME));
     }
 
-    // Arriva dal thread del game loop: la schermata cambia sul thread di Swing, dopo una breve pausa,
-    // e solo se nel frattempo il giocatore non è già tornato al menu
+    /**
+     * Arriva dal thread del game loop: la schermata cambia sul thread di Swing, dopo una breve pausa,
+     * e solo se nel frattempo il giocatore non è già tornato al menu.
+     */
     @Override
     public void showGameOver(final int score) {
         SwingUtilities.invokeLater(() -> {
             final Timer timer = new Timer(GAME_OVER_DELAY_MS, e -> {
                 if (GAME.equals(this.currentScreen)) {
                     this.gameOverPanel.showScore(score);
-                    show(GAME_OVER);
+                    showScreen(GAME_OVER);
                 }
             });
             timer.setRepeats(false);
@@ -112,7 +136,15 @@ public class GameFrameImpl extends JFrame implements GameFrame {
         });
     }
 
-    private void show(final String name) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void close() {
+        SwingUtilities.invokeLater(() -> this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)));
+    }
+
+    private void showScreen(final String name) {
         this.currentScreen = name;
         this.cards.show(this.screens, name);
     }

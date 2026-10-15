@@ -11,7 +11,7 @@ import mvc.model.api.XY;
  * Implementation of SliceableModelFactory.
  * The choice of which power-up to create belongs to the Spawner, that knows the game state.
  */
-public class SliceableModelFactoryImpl implements SliceableModelFactory {
+public final class SliceableModelFactoryImpl implements SliceableModelFactory {
 
     /**
      * {@inheritDoc}

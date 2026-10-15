@@ -1,11 +1,13 @@
 package mvc.model.impl;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import mvc.model.api.DifficultyEnum;
 import mvc.model.api.GameState;
 import mvc.model.api.GameStateEnum;
@@ -25,24 +27,34 @@ import mvc.model.api.XY;
 /**
  * Implementation of GameWorld api.
  */
-public class GameWorldImpl implements GameWorld {    
-    private double spawnTimer = 0.0;
-    private Set<SliceableModel> activeSliceables;
-    private Physics physics;
-    private Spawner spawner;
-    private SliceHandler sliceHandler;
-    private GameState gameState;
-    private SliceableModelFactory factory;
+public final class GameWorldImpl implements GameWorld {
+    private double spawnTimer;
+    private final Set<SliceableModel> activeSliceables;
+    private final Physics physics;
+    private final Spawner spawner;
+    private final SliceHandler sliceHandler;
+    private final GameState gameState;
+    private final SliceableModelFactory factory;
     private Optional<PowerUpModel> activePowerUp;
-    private Set<GameWorldListener> listeners = new HashSet<>();
+    private final Set<GameWorldListener> listeners = new HashSet<>();
     private boolean gameOverNotified;
 
     /**
      * creates all the needed objects.
+     *
+     * @param physics moves the sliceables
+     * @param spawner decides what to launch and when
+     * @param sliceHandler decides if a mouse movement cuts a sliceable
+     * @param factory creates the sliceables
+     * @param gameState lives, score and power-up effects
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "The components are injected by App and belong to this model only"
+    )
     public GameWorldImpl(
-        final Physics physics,final Spawner spawner,
-        final SliceHandler sliceHandler, final SliceableModelFactory factory, 
+        final Physics physics, final Spawner spawner,
+        final SliceHandler sliceHandler, final SliceableModelFactory factory,
         final GameState gameState
     ) {
         this.activeSliceables = new HashSet<>();
@@ -67,7 +79,7 @@ public class GameWorldImpl implements GameWorld {
             this.physics.updatePhysics(activeSliceables, deltaTime);
         }
         if (this.activePowerUp.isPresent()) {
-            PowerUpModel active = this.activePowerUp.get();
+            final PowerUpModel active = this.activePowerUp.get();
             active.decreaseDuration(deltaTime);
             if (active.isEnded()) {
                 deactivateCurrentPowerUp();
@@ -78,15 +90,15 @@ public class GameWorldImpl implements GameWorld {
         if (gameState.getGameState() != GameStateEnum.FREEZED) {
             this.spawnTimer += deltaTime;
         }
-        double currentSpawnInterval = spawner.calculateNextSpawnInterval(gameState.getScore(), gameState.getLives());
+        final double currentSpawnInterval = spawner.calculateNextSpawnInterval(gameState.getScore(), gameState.getLives());
         if (this.spawnTimer >= currentSpawnInterval) {
             spawn();
             this.spawnTimer = 0.0;
         }
-        Iterator<SliceableModel> iterator = activeSliceables.iterator();
+        final Iterator<SliceableModel> iterator = activeSliceables.iterator();
         while (iterator.hasNext()) {
-            SliceableModel s = iterator.next();
-            
+            final SliceableModel s = iterator.next();
+
             if (s.hasBeenCut()) {
                 iterator.remove();
             } else if (s.isOutOfBound(HEIGHT)) {
@@ -101,9 +113,13 @@ public class GameWorldImpl implements GameWorld {
         checkGameOver();
     }
 
-    public void processSwipe(XY<Double> initialXy, XY<Double> finalXy) {
-        for (SliceableModel sliceable : activeSliceables) {
-            
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void processSwipe(final XY<Double> initialXy, final XY<Double> finalXy) {
+        for (final SliceableModel sliceable : activeSliceables) {
+
             if (!sliceable.hasBeenCut() && sliceHandler.isSliceLegit(sliceable, initialXy, finalXy)) {
                 sliceable.setAsCutted(true);
                 if (sliceable.getType() == SliceableTypeEnum.POWERUP) {
@@ -152,34 +168,30 @@ public class GameWorldImpl implements GameWorld {
         return this.activePowerUp.isPresent() || getActiveSliceables().stream().anyMatch(s -> s instanceof PowerUpModel);
     }
 
-    
     /**
      * {@inheritDoc}
      */
     @Override
     public Set<SliceableModel> getActiveSliceables() {
-        return this.activeSliceables;
+        // Vista in sola lettura: chi la riceve non può aggiungere o togliere oggetti dal mondo
+        return Collections.unmodifiableSet(this.activeSliceables);
     }
 
     private void activatePowerUp(final PowerUpModel powerup) {
         switch (powerup.getPowerUp()) {
-            case ONE_UP: 
-                this.gameState.addLife();
-                break;
-            case SAFE_ZONE: 
+            case ONE_UP -> this.gameState.addLife();
+            case SAFE_ZONE -> {
                 this.gameState.setInvulnerability(true);
                 this.activePowerUp = Optional.of(powerup);
-                break;
-            case X2:
+            }
+            case X2 -> {
                 this.gameState.setMultiplier(2);
                 this.activePowerUp = Optional.of(powerup);
-                break;
-            case FREEZE:
+            }
+            case FREEZE -> {
                 this.gameState.setGameState(GameStateEnum.FREEZED);
                 this.activePowerUp = Optional.of(powerup);
-                break;
-            default:
-                throw new IllegalStateException("powerup not excepted");
+            }
         }
         notifyListeners(listener -> listener.onPowerUpActivate(powerup.getPowerUp()));
     }
@@ -190,10 +202,10 @@ public class GameWorldImpl implements GameWorld {
             case SAFE_ZONE:
                 this.gameState.setInvulnerability(false);
                 break;
-            case X2: 
+            case X2:
                 this.gameState.setMultiplier(1);
                 break;
-            case FREEZE: 
+            case FREEZE:
                 this.gameState.setGameState(GameStateEnum.RUNNING);
                 break;
             default:
@@ -203,31 +215,49 @@ public class GameWorldImpl implements GameWorld {
         notifyListeners(listener -> listener.onPowerUpDeactivate(ended));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void addListener(GameWorldListener listener) {
+    public void addListener(final GameWorldListener listener) {
         this.listeners.add(listener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean isGameover() {
-        return this.gameState.getGameState().equals(GameStateEnum.GAMEOVER);
+    public boolean isGameOver() {
+        return this.gameState.getGameState() == GameStateEnum.GAMEOVER;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getLives() {
         return this.gameState.getLives();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getScore() {
         return this.gameState.getScore();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<PowerUpStatus> getActivePowerUp() {
         return this.activePowerUp.map(p -> new PowerUpStatus(p.getPowerUp(), p.getTimeReameaning().orElse(0.0)));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void newGame(final DifficultyEnum difficulty) {
         this.activeSliceables.clear();

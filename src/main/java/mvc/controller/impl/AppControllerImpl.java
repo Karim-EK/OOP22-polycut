@@ -2,6 +2,7 @@ package mvc.controller.impl;
 
 import java.util.Optional;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import mvc.controller.api.AppController;
 import mvc.controller.api.AudioManager;
 import mvc.controller.api.GameLoop;
@@ -17,7 +18,11 @@ import mvc.view.api.GameFrame;
  * it is created when the game starts and stopped when the player leaves it.
  * It observes the model only to know when the game is over.
  */
-public class AppControllerImpl implements AppController, GameWorldListener {
+@SuppressFBWarnings(
+    value = "EI_EXPOSE_REP2",
+    justification = "Controllers, audio and view are shared on purpose: App connects them once at startup"
+)
+public final class AppControllerImpl implements AppController, GameWorldListener {
 
     private static final long LOOP_JOIN_TIMEOUT_MS = 500;
 
@@ -39,12 +44,16 @@ public class AppControllerImpl implements AppController, GameWorldListener {
 
     /**
      * The view is set after the construction because it needs this controller for its buttons.
+     *
      * @param view the main window
      */
     public void setView(final GameFrame view) {
         this.view = Optional.of(view);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startGame() {
         stopLoop();
@@ -62,6 +71,9 @@ public class AppControllerImpl implements AppController, GameWorldListener {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void backToMenu() {
         stopLoop();
@@ -69,67 +81,103 @@ public class AppControllerImpl implements AppController, GameWorldListener {
         this.view.ifPresent(GameFrame::showMenu);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void quit() {
         stopLoop();
         this.audio.stopMusic();
-        System.exit(0);
+        // La finestra riceve l'evento di chiusura: è Swing a terminare l'applicazione
+        this.view.ifPresent(GameFrame::close);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DifficultyEnum getDifficulty() {
         return this.difficulty;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setDifficulty(final DifficultyEnum difficulty) {
         this.difficulty = difficulty;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setMusicEnabled(final boolean enabled) {
         this.audio.setMusicEnabled(enabled);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isMusicEnabled() {
         return this.audio.isMusicEnabled();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setEffectsEnabled(final boolean enabled) {
         this.audio.setEffectsEnabled(enabled);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEffectsEnabled() {
         return this.audio.isEffectsEnabled();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void playClick() {
         this.audio.playClick();
     }
 
-    // Chiamato dal game loop quando le vite finiscono: la view mostra la schermata finale
+    /**
+     * Chiamato dal game loop quando le vite finiscono: la view mostra la schermata finale.
+     */
     @Override
     public void onGameOver(final int score) {
         this.view.ifPresent(v -> v.showGameOver(score));
     }
 
+    /**
+     * Non serve al flusso dell'applicazione.
+     */
     @Override
     public void onSliceableCut(final SliceableModel sliceable) {
-        // Non serve al flusso dell'applicazione
+        // Nessuna azione
     }
 
+    /**
+     * Non serve al flusso dell'applicazione.
+     */
     @Override
     public void onPowerUpActivate(final PowerUpEnum powerUp) {
-        // Non serve al flusso dell'applicazione
+        // Nessuna azione
     }
 
+    /**
+     * Non serve al flusso dell'applicazione.
+     */
     @Override
     public void onPowerUpDeactivate(final PowerUpEnum powerUp) {
-        // Non serve al flusso dell'applicazione
+        // Nessuna azione
     }
 
     // Ferma il game loop della partita precedente e aspetta che il suo thread finisca,

@@ -50,8 +50,8 @@ public class GameStateImpl implements GameState {
      * {@inheritDoc}
      */
     @Override
-    public void gainScore(final int score) {
-        this.score = this.score + score * multiplier;
+    public void gainScore(final int points) {
+        this.score = this.score + points * multiplier;
     }
 
     /**
@@ -81,7 +81,7 @@ public class GameStateImpl implements GameState {
     @Override
     public void decreseLife() {
         if (this.lives > 0) {
-            this.lives --;
+            this.lives--;
             if (lives == 0) {
                 this.gamestate = GameStateEnum.GAMEOVER;
             }
@@ -113,9 +113,9 @@ public class GameStateImpl implements GameState {
     }
 
     /**
-     * TODO.
-     * @param activate
+     * {@inheritDoc}
      */
+    @Override
     public void setInvulnerability(final boolean activate) {
         this.invulnerability = activate;
     }
@@ -128,6 +128,9 @@ public class GameStateImpl implements GameState {
         this.multiplier = multiplier;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isInvulnerable() {
         return this.invulnerability;

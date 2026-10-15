@@ -9,7 +9,7 @@ import mvc.controller.api.AppController;
 /**
  * Game over screen: final score, best score of the session, play again or back to the menu.
  */
-public class GameOverPanel extends BackgroundPanel {
+public final class GameOverPanel extends BackgroundPanel {
 
     private static final long serialVersionUID = 1L;
     private static final float TITLE_SIZE = 64f;
@@ -55,6 +55,7 @@ public class GameOverPanel extends BackgroundPanel {
 
     /**
      * Updates the labels with the score of the game just finished.
+     *
      * @param score the final score
      */
     public void showScore(final int score) {

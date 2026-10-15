@@ -8,7 +8,7 @@ import mvc.model.api.XY;
 /**
  * Implementation of SliceHandler api.
  */
-public class SliceHandlerImpl implements SliceHandler {
+public final class SliceHandlerImpl implements SliceHandler {
 
     private static final double TOLERANCE = 0.8;
     // Triangolo e quadrato hanno l'apotema più corto rispetto al raggio circoscritto:
@@ -29,7 +29,7 @@ public class SliceHandlerImpl implements SliceHandler {
      */
     @Override
     public boolean isSliceLegit(final SliceableModel sliceable, final XY<Double> startingPoint, final XY<Double> endingPoint) {
-        
+
         final double ax = startingPoint.x();
         final double ay = startingPoint.y();
         final double bx = endingPoint.x();

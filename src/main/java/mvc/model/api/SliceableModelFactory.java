@@ -7,6 +7,7 @@ public interface SliceableModelFactory {
 
     /**
      * Create a Sliceable excluding PowerUps.
+     *
      * @param type of sliceable to create
      * @param positionXy the coordinates to spawn the Sliceable
      * @param velocityXy the initial velocity for the Sliceable
@@ -16,6 +17,7 @@ public interface SliceableModelFactory {
 
     /**
      * Create a PowerUp.
+     *
      * @param powerUp which power-up to create
      * @param positionXy the coordinates to spawn the PowerUp
      * @param velocityXy the initial velocity for the PowerUp
