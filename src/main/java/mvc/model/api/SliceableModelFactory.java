@@ -6,11 +6,20 @@ package mvc.model.api;
 public interface SliceableModelFactory {
 
     /**
-     * Create a random Sliceable excluding PowerUps.
+     * Create a Sliceable excluding PowerUps.
      * @param type of sliceable to create
      * @param positionXy the coordinates to spawn the Sliceable
      * @param velocityXy the initial velocity for the Sliceable
      * @return new Sliceable
      */
     SliceableModel createSliceable(SliceableTypeEnum type, XY<Double> positionXy, XY<Double> velocityXy);
+
+    /**
+     * Create a PowerUp.
+     * @param powerUp which power-up to create
+     * @param positionXy the coordinates to spawn the PowerUp
+     * @param velocityXy the initial velocity for the PowerUp
+     * @return new PowerUp
+     */
+    PowerUpModel createPowerUp(PowerUpEnum powerUp, XY<Double> positionXy, XY<Double> velocityXy);
 }

@@ -5,6 +5,11 @@ package mvc.model.api;
  */
 public interface GameState {
     /**
+     * Lives at the start of the game, and the maximum the player can have.
+     */
+    int MAX_LIVES = 3;
+
+    /**
      * Score getter.
      * @return current score
      */

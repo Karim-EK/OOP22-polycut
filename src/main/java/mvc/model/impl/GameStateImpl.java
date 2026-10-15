@@ -18,7 +18,7 @@ public class GameStateImpl implements GameState {
      * sets up all the fields.
      */
     public GameStateImpl() {
-        this.lives = 3;
+        this.lives = MAX_LIVES;
         this.score = 0;
         this.gamestate = GameStateEnum.RUNNING;
         this.invulnerability = false;
@@ -54,7 +54,7 @@ public class GameStateImpl implements GameState {
      */
     @Override
     public boolean addLife() {
-        if (lives < 3) {
+        if (lives < MAX_LIVES) {
             lives++;
             return true;
         } else {

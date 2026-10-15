@@ -116,11 +116,10 @@ public class GameWorldImpl implements GameWorld {
         }
     }
 
-    /**
-     * TODO.
-     */
-    public void spawn() {
-        activeSliceables.add(spawner.spawn(gameState.getScore(), gameState.getLives(), WIDTH, HEIGHT, factory, isPowerUpOnScreenOrActive()).get());
+    // Un lancio può contenere più oggetti (ondata)
+    private void spawn() {
+        activeSliceables.addAll(spawner.spawn(gameState.getScore(), gameState.getLives(), WIDTH, HEIGHT, factory,
+            isPowerUpOnScreenOrActive()));
     }
 
     /**
