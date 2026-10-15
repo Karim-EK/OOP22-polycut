@@ -83,6 +83,11 @@ public final class MenuPanel extends BackgroundPanel {
         title.setForeground(UiStyle.DARK);
         addRow(title);
 
+        // Il record mostrato, sopra PLAY, è sempre quello del livello selezionato
+        this.recordLabel.setFont(UiStyle.font(RECORD_SIZE));
+        this.recordLabel.setForeground(UiStyle.DARK);
+        addRow(this.recordLabel);
+
         final JButton play = UiStyle.button("PLAY");
         play.addActionListener(e -> {
             app.playClick();
@@ -97,11 +102,6 @@ public final class MenuPanel extends BackgroundPanel {
             refresh();
         });
         addRow(this.difficultyButton);
-
-        // Il record mostrato è sempre quello del livello selezionato
-        this.recordLabel.setFont(UiStyle.font(RECORD_SIZE));
-        this.recordLabel.setForeground(UiStyle.DARK);
-        addRow(this.recordLabel);
 
         final JButton options = UiStyle.button("OPTIONS");
         options.addActionListener(e -> {
