@@ -16,9 +16,6 @@ import mvc.model.api.XY;
  */
 public class GameWorldControllerImpl implements GameWorldController {
 
-    public static final double WIDTH = 160.0;
-    public static final double HEIGHT = 90.0;
-
     private final GameWorld model;
     private final Queue<Swipe> pendingSwipes = new ConcurrentLinkedQueue<>();
 

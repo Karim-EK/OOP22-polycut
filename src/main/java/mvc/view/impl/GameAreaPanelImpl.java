@@ -10,7 +10,6 @@ import java.awt.Polygon;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -19,8 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import mvc.controller.api.GameWorldController;
-import mvc.controller.impl.GameWorldControllerImpl;
-import mvc.model.api.GameWorldListener;
+import mvc.model.api.GameWorld;
 import mvc.model.api.PowerUpEnum;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.SliceableTypeEnum;
@@ -28,7 +26,7 @@ import mvc.model.api.XY;
 import mvc.view.api.GameAreaPanel;
 
 
-public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorldListener {
+public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
 
     private Optional<Image> background = Optional.empty();
     
@@ -40,8 +38,6 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
     private final URL url1L = getClass().getResource("/GraphicElements/heart.png");
     private final URL url2L = getClass().getResource("/GraphicElements/2hearts.png");
     private final URL url3L = getClass().getResource("/GraphicElements/3hearts.png");
-    
-    private Set<SliceableModel> visibleSliceables;
     
     private int livesCounter;
     private GameWorldController controller;
@@ -78,8 +74,8 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
             double pixelX = (double) e.getX();
             double pixelY = (double) e.getY();
             
-            double scaleX = (double) getWidth() / GameWorldControllerImpl.WIDTH;
-            double scaleY = (double) getHeight() / GameWorldControllerImpl.HEIGHT;
+            double scaleX = (double) getWidth() / GameWorld.WIDTH;
+            double scaleY = (double) getHeight() / GameWorld.HEIGHT;
             
             XY<Double> logicalPrev = new XY<>(
                 previousMousePosition.get().x() / scaleX, 
@@ -108,9 +104,9 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
     @Override
     protected void paintComponent(final Graphics g) {
         this.livesCounter = controller.getLives();
-        this.visibleSliceables = new HashSet<>(this.controller.getVisibleSliceables());
-        final double scaleX = (double) this.getWidth() / GameWorldControllerImpl.WIDTH;
-        final double scaleY = (double) this.getHeight() / GameWorldControllerImpl.HEIGHT;
+        final Set<SliceableModel> visibleSliceables = this.controller.getVisibleSliceables();
+        final double scaleX = (double) this.getWidth() / GameWorld.WIDTH;
+        final double scaleY = (double) this.getHeight() / GameWorld.HEIGHT;
         super.paintComponent(g);
         background.ifPresent(bg -> g.drawImage(bg, 0, 0, this));
 
@@ -144,8 +140,8 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
     }
 
     @Override
-    public void addSliceables(SliceableModel sliceable) {
-        visibleSliceables.add(sliceable);
+    public void render() {
+        this.repaint();
     }
 
     @Override

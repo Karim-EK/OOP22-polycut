@@ -8,6 +8,16 @@ import java.util.Set;
 public interface GameWorld {
 
     /**
+     * Width of the game world in logical units, independent from the window size.
+     */
+    double WIDTH = 160.0;
+
+    /**
+     * Height of the game world in logical units, independent from the window size.
+     */
+    double HEIGHT = 90.0;
+
+    /**
      * update the state of the game.
      * @param deltaTime refresh rate
      */

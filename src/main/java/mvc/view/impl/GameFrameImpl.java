@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 import mvc.controller.api.GameWorldController;
+import mvc.view.api.GameAreaPanel;
 import mvc.view.api.GameFrame;
 
 public class GameFrameImpl extends JFrame implements GameFrame {
@@ -47,7 +48,7 @@ public class GameFrameImpl extends JFrame implements GameFrame {
     }
 
     @Override
-    public GameAreaPanelImpl getGameArea() {
+    public GameAreaPanel getGameArea() {
         return this.gamePanel;
     }
 }

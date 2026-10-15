@@ -5,14 +5,8 @@ import mvc.model.api.XY;
 import java.awt.Polygon;
 import java.awt.Graphics;
 
-import static mvc.controller.impl.GameWorldControllerImpl.WIDTH;
-import static mvc.controller.impl.GameWorldControllerImpl.HEIGHT;
-
 
 public class GameAreaHelper {
-    static XY<Double> mapCoordinates(XY<Double> xy, int panelWidth, int panelHeight) {
-        return new XY<Double>((panelWidth / WIDTH), (panelHeight / HEIGHT));
-    }
 
     public static Polygon createPolygon(final SliceableTypeEnum type, final XY<Double> logicalCenter, 
                                         final double logicalApothem, final double scaleX, final double scaleY) {

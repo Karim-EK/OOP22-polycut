@@ -1,14 +1,14 @@
 package mvc.view.api;
 
-import mvc.view.impl.GameAreaPanelImpl;
-
+/**
+ * The main window of the game.
+ */
 public interface GameFrame {
     /**
      * @return user's screen's width.
      */
     int getScreenWidth();
 
-    
     /**
      * @return user's screen's height.
      */
@@ -17,5 +17,5 @@ public interface GameFrame {
     /**
      * @return the game area
      */
-    GameAreaPanelImpl getGameArea();
+    GameAreaPanel getGameArea();
 }

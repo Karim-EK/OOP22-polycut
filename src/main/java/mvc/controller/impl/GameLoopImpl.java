@@ -2,7 +2,7 @@ package mvc.controller.impl;
 
 import mvc.controller.api.GameLoop;
 import mvc.controller.api.GameWorldController;
-import mvc.view.impl.GameAreaPanelImpl;
+import mvc.view.api.GameAreaPanel;
 
 public class GameLoopImpl implements GameLoop {
 
@@ -11,9 +11,9 @@ public class GameLoopImpl implements GameLoop {
     
     private volatile boolean running = false;
     private final GameWorldController controller;
-    private final GameAreaPanelImpl viewPanel;
+    private final GameAreaPanel viewPanel;
 
-    public GameLoopImpl(final GameWorldController controller, final GameAreaPanelImpl viewPanel) {
+    public GameLoopImpl(final GameWorldController controller, final GameAreaPanel viewPanel) {
         this.controller = controller;
         this.viewPanel = viewPanel;
     }
@@ -32,7 +32,7 @@ public class GameLoopImpl implements GameLoop {
             // 1. Calcolo del deltaTime in secondi (fondamentale per la fisica indipendente dal framerate)
             final double delta = updateLength / 1_000_000_000.0;
             this.controller.update(delta);
-            this.viewPanel.repaint();
+            this.viewPanel.render();
             
             // 4. Thread Sleep (Risparmio CPU e limitazione FPS)
             // Calcoliamo quanto tempo ci è rimasto prima di dover generare il prossimo frame

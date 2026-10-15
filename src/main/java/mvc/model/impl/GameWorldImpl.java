@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
-import mvc.controller.impl.GameWorldControllerImpl;
 import mvc.model.api.GameState;
 import mvc.model.api.GameStateEnum;
 import mvc.model.api.GameWorldListener;
@@ -18,9 +17,6 @@ import mvc.model.api.SliceableModelFactory;
 import mvc.model.api.SliceableTypeEnum;
 import mvc.model.api.Spawner;
 import mvc.model.api.XY;
-
-import static mvc.controller.impl.GameWorldControllerImpl.WIDTH;
-import static mvc.controller.impl.GameWorldControllerImpl.HEIGHT;
 
 /**
  * Implementation of GameWorld api.
@@ -84,7 +80,7 @@ public class GameWorldImpl implements GameWorld {
             
             if (s.hasBeenCut()) {
                 iterator.remove();
-            } else if (s.isOutOfBound(GameWorldControllerImpl.HEIGHT)) {
+            } else if (s.isOutOfBound(HEIGHT)) {
                 if (s.getType() != SliceableTypeEnum.BOMB && s.getType() != SliceableTypeEnum.POWERUP) {
                     gameState.decreseLife();
                 }
