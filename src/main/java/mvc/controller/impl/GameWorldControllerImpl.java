@@ -1,47 +1,85 @@
 package mvc.controller.impl;
 
-import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import mvc.controller.api.GameWorldController;
 import mvc.model.api.GameWorld;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.XY;
 
-
+/**
+ * Implementation of GameWorldController.
+ * The model is only touched by the game loop thread: swipes coming from the Swing thread
+ * are queued and applied at the next update, while the view reads an immutable snapshot.
+ */
 public class GameWorldControllerImpl implements GameWorldController {
 
     public static final double WIDTH = 160.0;
     public static final double HEIGHT = 90.0;
 
     private final GameWorld model;
+    private final Queue<Swipe> pendingSwipes = new ConcurrentLinkedQueue<>();
 
-    public GameWorldControllerImpl(GameWorld model) {
+    private volatile Set<SliceableModel> visibleSliceables;
+    private volatile int lives;
+    private volatile boolean gameOver;
+
+    /**
+     * @param model the game world to drive
+     */
+    public GameWorldControllerImpl(final GameWorld model) {
         this.model = model;
+        publishSnapshot();
     }
 
+    /**
+     * Called by the game loop thread: applies the queued swipes, updates the model
+     * and publishes a new snapshot for the view.
+     */
     @Override
-    public void update(double deltaTime) {
+    public void update(final double deltaTime) {
+        Swipe swipe = this.pendingSwipes.poll();
+        while (swipe != null) {
+            this.model.processSwipe(swipe.from(), swipe.to());
+            swipe = this.pendingSwipes.poll();
+        }
         this.model.update(deltaTime);
+        publishSnapshot();
     }
 
+    /**
+     * Called by the Swing thread: the swipe is only queued, the model is not touched here.
+     */
     @Override
-    public void processSwipe(XY<Double> initialXy, XY<Double> finalXy) {
-        this.model.processSwipe(initialXy, finalXy);
+    public void processSwipe(final XY<Double> initialXy, final XY<Double> finalXy) {
+        this.pendingSwipes.offer(new Swipe(initialXy, finalXy));
     }
 
     @Override
     public Set<SliceableModel> getVisibleSliceables() {
-        return new HashSet<>(this.model.getActiveSliceables());
+        return this.visibleSliceables;
     }
 
     @Override
     public boolean isGameOver() {
-        return model.isGameover();
+        return this.gameOver;
     }
 
     @Override
     public int getLives() {
-        return this.model.getLives();
+        return this.lives;
     }
+
+    private void publishSnapshot() {
+        this.visibleSliceables = Set.copyOf(this.model.getActiveSliceables());
+        this.lives = this.model.getLives();
+        this.gameOver = this.model.isGameover();
+    }
+
+    /**
+     * A mouse movement in logical coordinates, waiting to be applied to the model.
+     */
+    private record Swipe(XY<Double> from, XY<Double> to) { }
 }

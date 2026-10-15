@@ -114,14 +114,15 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel, GameWorl
         super.paintComponent(g);
         background.ifPresent(bg -> g.drawImage(bg, 0, 0, this));
 
-        final Image livesImage = switch (livesCounter) {
-            case 1 -> image1L;
-            case 2 -> image2L;
-            case 3 -> image3L;
-            default -> throw new IllegalStateException("can't draw " + livesCounter + " lives");
+        // Con 0 vite non si disegnano cuori: la schermata di game over arriverà in seguito
+        final Optional<Image> livesImage = switch (livesCounter) {
+            case 1 -> Optional.of(image1L);
+            case 2 -> Optional.of(image2L);
+            case 3 -> Optional.of(image3L);
+            default -> Optional.empty();
         };
-        
-        g.drawImage(livesImage, 0, 0, this);
+
+        livesImage.ifPresent(img -> g.drawImage(img, 0, 0, this));
 
         //TODO: SWICH COLORI
         g.setColor(Color.RED);

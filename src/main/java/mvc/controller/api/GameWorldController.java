@@ -10,10 +10,11 @@ public interface GameWorldController {
     // Chiamato dal GameLoop ad ogni frame
     void update(double deltaTime);
     
-    // Chiamato dal GameAreaPanel quando l'utente trascina il mouse
+    // Chiamato dal GameAreaPanel (thread di Swing) quando l'utente trascina il mouse:
+    // lo swipe viene messo in coda e applicato al model al prossimo update
     void processSwipe(XY<Double> initialXy, XY<Double> finalXy);
-    
-    // Chiamato dalla View per ottenere i dati da disegnare (in Sola Lettura!)
+
+    // Chiamato dalla View per ottenere i dati da disegnare: copia immutabile dell'ultimo frame
     Set<SliceableModel> getVisibleSliceables();
 
     boolean isGameOver();
