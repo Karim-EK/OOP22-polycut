@@ -2,7 +2,10 @@ package mvc.controller.api;
 
 import java.util.Set;
 
+import java.util.Optional;
+
 import mvc.model.api.DifficultyEnum;
+import mvc.model.api.PowerUpStatus;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.XY;
 
@@ -23,6 +26,9 @@ public interface GameWorldController {
     int getLives();
 
     int getScore();
+
+    // Power-up a tempo attivo nell'ultimo frame, per il timer in alto al centro
+    Optional<PowerUpStatus> getActivePowerUp();
 
     // Chiamato prima di avviare il game loop di una nuova partita
     void newGame(DifficultyEnum difficulty);

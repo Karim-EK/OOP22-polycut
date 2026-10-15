@@ -14,6 +14,7 @@ import mvc.model.api.GameWorld;
 import mvc.model.api.Physics;
 import mvc.model.api.PowerUpEnum;
 import mvc.model.api.PowerUpModel;
+import mvc.model.api.PowerUpStatus;
 import mvc.model.api.SliceHandler;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.SliceableModelFactory;
@@ -218,6 +219,11 @@ public class GameWorldImpl implements GameWorld {
     @Override
     public int getScore() {
         return this.gameState.getScore();
+    }
+
+    @Override
+    public Optional<PowerUpStatus> getActivePowerUp() {
+        return this.activePowerUp.map(p -> new PowerUpStatus(p.getPowerUp(), p.getTimeReameaning().orElse(0.0)));
     }
 
     @Override

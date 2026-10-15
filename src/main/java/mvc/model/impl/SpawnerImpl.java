@@ -47,7 +47,8 @@ public class SpawnerImpl implements Spawner  {
         final List<SliceableModel> launched = new ArrayList<>();
         // Al massimo un power-up per ondata, e nessuno se ce n'è già uno a schermo o attivo
         boolean powerUpAllowed = !powerUpActiveOrOnScreen;
-        for (int i = 0; i < chooseWaveSize(score); i++) {
+        final int waveSize = chooseWaveSize(effectiveScore(score));
+        for (int i = 0; i < waveSize; i++) {
             final XY<Double> position = chooseStartingPosition(screenWidth, screenHeight);
             final XY<Double> velocity = chooseVelocity(position, screenWidth, screenHeight);
             final SliceableTypeEnum type = chooseWeightedType(powerUpAllowed);
@@ -65,7 +66,7 @@ public class SpawnerImpl implements Spawner  {
     public double calculateNextSpawnInterval(final int score, final int lives) {
         final double min = this.difficulty.getMinInterval();
         final double initial = this.difficulty.getInitialInterval();
-        double time = min + (initial - min) * Math.exp(-this.difficulty.getDecay() * score);
+        double time = min + (initial - min) * Math.exp(-this.difficulty.getDecay() * effectiveScore(score));
 
         if (lives == 1) {
             time *= LAST_LIFE_SLOWDOWN;
@@ -76,6 +77,11 @@ public class SpawnerImpl implements Spawner  {
     @Override
     public void setDifficulty(final DifficultyEnum difficulty) {
         this.difficulty = difficulty;
+    }
+
+    // Punteggio usato per la difficoltà: quello reale più il vantaggio virtuale del livello
+    private int effectiveScore(final int score) {
+        return score + this.difficulty.getStartingScore();
     }
 
     private int chooseWaveSize(final int score) {

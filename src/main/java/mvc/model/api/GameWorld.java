@@ -1,5 +1,6 @@
 package mvc.model.api;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -50,6 +51,11 @@ public interface GameWorld {
      * @return the current score
      */
     int getScore();
+
+    /**
+     * @return the power-up with a duration that is active now, if any
+     */
+    Optional<PowerUpStatus> getActivePowerUp();
 
     /**
      * Clears the world and starts a new game.

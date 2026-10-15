@@ -1,5 +1,6 @@
 package mvc.controller.impl;
 
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -7,6 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import mvc.controller.api.GameWorldController;
 import mvc.model.api.DifficultyEnum;
 import mvc.model.api.GameWorld;
+import mvc.model.api.PowerUpStatus;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.XY;
 
@@ -24,6 +26,7 @@ public class GameWorldControllerImpl implements GameWorldController {
     private volatile int lives;
     private volatile int score;
     private volatile boolean gameOver;
+    private volatile Optional<PowerUpStatus> activePowerUp = Optional.empty();
 
     /**
      * @param model the game world to drive
@@ -76,6 +79,11 @@ public class GameWorldControllerImpl implements GameWorldController {
         return this.score;
     }
 
+    @Override
+    public Optional<PowerUpStatus> getActivePowerUp() {
+        return this.activePowerUp;
+    }
+
     /**
      * Called while no game loop is running: resets the model and publishes the empty world.
      */
@@ -91,6 +99,7 @@ public class GameWorldControllerImpl implements GameWorldController {
         this.lives = this.model.getLives();
         this.score = this.model.getScore();
         this.gameOver = this.model.isGameover();
+        this.activePowerUp = this.model.getActivePowerUp();
     }
 
     /**

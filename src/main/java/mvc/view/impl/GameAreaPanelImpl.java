@@ -45,9 +45,12 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
     private final URL url3L = getClass().getResource("/GraphicElements/3hearts.png");
     private final URL urlBomb = getClass().getResource("/GraphicElements/bomb.png");
 
-    // Dimensione del punteggio e margine, in frazione dell'altezza del pannello
-    private static final double SCORE_SIZE = 0.07;
-    private static final double SCORE_MARGIN = 0.03;
+    // I cuori sono un'immagine fissa alta 60 pixel: il punteggio si centra sulla stessa riga
+    private static final int HEARTS_HEIGHT = 60;
+    private static final float SCORE_SIZE = 40f;
+    private static final int SCORE_MARGIN = 20;
+
+    private final PowerUpBadge powerUpBadge = new PowerUpBadge(UiStyle.background());
 
     private int livesCounter;
     private GameWorldController controller;
@@ -152,16 +155,18 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
         }
 
         drawScore(g2);
+        this.controller.getActivePowerUp().ifPresent(status -> this.powerUpBadge.draw(g2, status, this.getWidth()));
     }
 
-    // Punteggio in alto a destra, allineato al bordo destro
+    // Punteggio in alto a destra, alla stessa altezza dei cuori
     private void drawScore(final Graphics2D g) {
         final String text = String.valueOf(this.controller.getScore());
-        final int margin = (int) Math.round(this.getHeight() * SCORE_MARGIN);
-        g.setFont(UiStyle.font((float) (this.getHeight() * SCORE_SIZE)));
+        g.setFont(UiStyle.font(SCORE_SIZE));
         final FontMetrics metrics = g.getFontMetrics();
+        // Linea di base scelta in modo che il centro delle cifre cada a metà dei cuori
+        final int baseline = HEARTS_HEIGHT / 2 + (metrics.getAscent() - metrics.getDescent()) / 2;
         g.setColor(UiStyle.DARK);
-        g.drawString(text, this.getWidth() - margin - metrics.stringWidth(text), margin + metrics.getAscent());
+        g.drawString(text, this.getWidth() - SCORE_MARGIN - metrics.stringWidth(text), baseline);
     }
 
     private void drawBomb(final Graphics2D g, final int cx, final int cy, final int r) {
