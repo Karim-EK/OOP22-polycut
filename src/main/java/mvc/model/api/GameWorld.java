@@ -50,4 +50,10 @@ public interface GameWorld {
      * @return the current score
      */
     int getScore();
+
+    /**
+     * Clears the world and starts a new game.
+     * @param difficulty the level chosen in the menu
+     */
+    void newGame(DifficultyEnum difficulty);
 }

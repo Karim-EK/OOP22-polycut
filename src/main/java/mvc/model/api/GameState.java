@@ -66,4 +66,9 @@ public interface GameState {
     void setMultiplier(int multiplier);
 
     boolean isInvulnerable();
+
+    /**
+     * Brings the state back to the start of a game: full lives, score 0, no power-up effects.
+     */
+    void reset();
 }

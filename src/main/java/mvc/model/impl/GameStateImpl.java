@@ -18,6 +18,19 @@ public class GameStateImpl implements GameState {
      * sets up all the fields.
      */
     public GameStateImpl() {
+        init();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reset() {
+        init();
+    }
+
+    // Metodo privato: il costruttore non deve chiamare metodi sovrascrivibili
+    private void init() {
         this.lives = MAX_LIVES;
         this.score = 0;
         this.gamestate = GameStateEnum.RUNNING;

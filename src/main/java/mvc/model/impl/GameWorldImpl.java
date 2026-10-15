@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import mvc.model.api.DifficultyEnum;
 import mvc.model.api.GameState;
 import mvc.model.api.GameStateEnum;
 import mvc.model.api.GameWorldListener;
@@ -217,5 +218,15 @@ public class GameWorldImpl implements GameWorld {
     @Override
     public int getScore() {
         return this.gameState.getScore();
+    }
+
+    @Override
+    public void newGame(final DifficultyEnum difficulty) {
+        this.activeSliceables.clear();
+        this.gameState.reset();
+        this.activePowerUp = Optional.empty();
+        this.spawnTimer = 0.0;
+        this.gameOverNotified = false;
+        this.spawner.setDifficulty(difficulty);
     }
 }

@@ -2,6 +2,7 @@ package mvc.controller.api;
 
 import java.util.Set;
 
+import mvc.model.api.DifficultyEnum;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.XY;
 
@@ -22,4 +23,7 @@ public interface GameWorldController {
     int getLives();
 
     int getScore();
+
+    // Chiamato prima di avviare il game loop di una nuova partita
+    void newGame(DifficultyEnum difficulty);
 }

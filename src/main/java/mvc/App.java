@@ -1,37 +1,51 @@
 package mvc;
 
+import javax.swing.SwingUtilities;
+
 import mvc.controller.api.AudioManager;
 import mvc.controller.api.GameWorldController;
+import mvc.controller.impl.AppControllerImpl;
 import mvc.controller.impl.AudioController;
-import mvc.controller.api.GameLoop;
-import mvc.controller.impl.GameLoopImpl;
 import mvc.controller.impl.GameWorldControllerImpl;
+import mvc.model.api.GameWorld;
 import mvc.model.impl.GameStateImpl;
 import mvc.model.impl.GameWorldImpl;
 import mvc.model.impl.PhysicsImpl;
 import mvc.model.impl.SliceHandlerImpl;
 import mvc.model.impl.SliceableModelFactoryImpl;
 import mvc.model.impl.SpawnerImpl;
-import mvc.model.api.GameWorld;
 import mvc.view.impl.GameFrameImpl;
 
-public class App {
-    public static void main(String[] args) {
-        GameWorld model = new GameWorldImpl(
-            new PhysicsImpl(), new SpawnerImpl(), new SliceHandlerImpl(), 
+/**
+ * Entry point: creates model, controllers and view and connects them.
+ * It is the only class that knows the concrete implementations.
+ */
+public final class App {
+
+    private App() {
+    }
+
+    /**
+     * @param args unused
+     */
+    public static void main(final String[] args) {
+        final GameWorld model = new GameWorldImpl(
+            new PhysicsImpl(), new SpawnerImpl(), new SliceHandlerImpl(),
             new SliceableModelFactoryImpl(), new GameStateImpl()
         );
-        GameWorldController controller = new GameWorldControllerImpl(model);
-        GameFrameImpl gameframe = new GameFrameImpl(controller);
-        model.addListener(gameframe.getGameArea());
+        final GameWorldController controller = new GameWorldControllerImpl(model);
         final AudioManager audio = new AudioController();
-        model.addListener(audio);
-        audio.startMusic();
-        gameframe.setVisible(true);
-        GameLoop gameLoop = new GameLoopImpl(controller, gameframe.getGameArea());
-        Thread loopThread = new Thread(gameLoop);
-        gameLoop.start();
-        loopThread.start();
+        final AppControllerImpl app = new AppControllerImpl(controller, audio);
+
+        // La view si crea sul thread di Swing, come richiede la libreria
+        SwingUtilities.invokeLater(() -> {
+            final GameFrameImpl frame = new GameFrameImpl(controller, app);
+            app.setView(frame);
+            model.addListener(frame.getGameArea());
+            model.addListener(audio);
+            model.addListener(app);
+            frame.setVisible(true);
+            app.backToMenu();
+        });
     }
 }
-  

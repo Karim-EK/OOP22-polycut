@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import mvc.controller.api.GameWorldController;
+import mvc.model.api.DifficultyEnum;
 import mvc.model.api.GameWorld;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.XY;
@@ -73,6 +74,16 @@ public class GameWorldControllerImpl implements GameWorldController {
     @Override
     public int getScore() {
         return this.score;
+    }
+
+    /**
+     * Called while no game loop is running: resets the model and publishes the empty world.
+     */
+    @Override
+    public void newGame(final DifficultyEnum difficulty) {
+        this.pendingSwipes.clear();
+        this.model.newGame(difficulty);
+        publishSnapshot();
     }
 
     private void publishSnapshot() {
