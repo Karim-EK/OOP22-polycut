@@ -11,35 +11,56 @@ import mvc.model.api.XY;
 
 /**
  * This class have sole task of properly generating the sliceables.
+ * Every sliceable is launched from below the bottom edge and its parabola
+ * always falls back on the bottom edge, inside the screen.
  */
 public class SpawnerImpl implements Spawner  {
     private static final int SHAPE_CHANCHE = 85;
     private static final int BOMB_CHANCHE = 95;
-    private static final int CENTRAL_OFFSET = 20;
     private static final double MARGIN = 10.0;
+    // Altezza del culmine (centro dell'oggetto), in frazione dell'altezza dello schermo misurata dall'alto
+    private static final double MIN_PEAK = 0.15;
+    private static final double MAX_PEAK = 0.5;
+    // Spostamento orizzontale massimo tra lancio e atterraggio, in frazione della larghezza
+    private static final double MAX_DRIFT = 0.4;
     private final Random random = new Random();
-    
+
     private static final double T_MAX = 3.0;
     private static final double T_MIN = 0.5;
     private static final double LAMBDA = 0.015;
 
-    public Optional<SliceableModel> spawn(int score, int lives, double screenWidth, double screenHeight,
-            SliceableModelFactory factory, boolean powerUpActiveOrOnScreen) {
-        final double startingPosition = chooseRandomX(screenWidth);
-        final boolean isLeft = isOnLeftSide(startingPosition, screenWidth);
-        final double shootingAngle = chooseRandomAngle(isLeft);
-        final XY<Double> startingVelocity = chooseVelocity(shootingAngle, startingPosition, screenWidth, screenHeight);
+    @Override
+    public Optional<SliceableModel> spawn(final int score, final int lives, final double screenWidth,
+            final double screenHeight, final SliceableModelFactory factory, final boolean powerUpActiveOrOnScreen) {
+        final double radius = SliceableModelImpl.RADIUS;
+        final double minX = radius + MARGIN;
+        final double maxX = screenWidth - radius - MARGIN;
+
+        // Partenza appena sotto il bordo inferiore, quindi ancora invisibile
+        final double startX = random.nextDouble(minX, maxX);
+        final double startY = screenHeight + radius;
+
+        // Velocità verticale scelta in base al culmine: h = vy^2 / (2g)  =>  vy = sqrt(2gh)
+        final double peakY = random.nextDouble(screenHeight * MIN_PEAK, screenHeight * MAX_PEAK);
+        final double verticalSpeed = Math.sqrt(2 * PhysicsImpl.GRAVITY * (startY - peakY));
+
+        // Il moto parabolico torna alla quota di partenza dopo T = 2 * vy / g
+        final double flightTime = 2 * verticalSpeed / PhysicsImpl.GRAVITY;
+
+        // Punto di atterraggio dentro lo schermo: il moto orizzontale è uniforme, quindi tutta la traiettoria resta dentro
+        final double maxDrift = screenWidth * MAX_DRIFT;
+        final double endX = random.nextDouble(Math.max(minX, startX - maxDrift), Math.min(maxX, startX + maxDrift));
+        final double horizontalSpeed = (endX - startX) / flightTime;
 
         final SliceableTypeEnum type = chooseWeightedType(powerUpActiveOrOnScreen);
+        // L'asse y punta verso il basso: per salire la velocità verticale è negativa
+        final XY<Double> startingVelocity = new XY<>(horizontalSpeed, -verticalSpeed);
 
-        // 2. (Opzionale) Scelta ponderata o casuale della Forma se separata dal Tipo
-        // Nel tuo Enum attuale, Forma e Tipo sembrano fusi o gestiti in modo particolare.
-        // Assumiamo che la factory crei la geometria in base al type.
-
-        return Optional.of(factory.createSliceable(type, new XY<>(startingPosition, screenHeight), startingVelocity));
+        return Optional.of(factory.createSliceable(type, new XY<>(startX, startY), startingVelocity));
     }
 
-    public double calculateNextSpawnInterval(int score, int lives) {
+    @Override
+    public double calculateNextSpawnInterval(final int score, final int lives) {
         double time = T_MIN + (T_MAX - T_MIN) * Math.exp(-LAMBDA * score);
 
         if (lives == 1) {
@@ -48,8 +69,8 @@ public class SpawnerImpl implements Spawner  {
         return time;
     }
 
-    private SliceableTypeEnum chooseWeightedType(boolean powerUpActiveOrOnScreen) {
-        int chance = random.nextInt(100);
+    private SliceableTypeEnum chooseWeightedType(final boolean powerUpActiveOrOnScreen) {
+        final int chance = random.nextInt(100);
 
         if (chance < SHAPE_CHANCHE) {
             return getType();
@@ -64,53 +85,11 @@ public class SpawnerImpl implements Spawner  {
     }
 
     private SliceableTypeEnum getType() {
-        var types = SliceableTypeEnum.values();
+        final var types = SliceableTypeEnum.values();
         SliceableTypeEnum type = types[random.nextInt(types.length)];
         while (type == SliceableTypeEnum.BOMB || type == SliceableTypeEnum.POWERUP) {
             type = types[random.nextInt(types.length)];
         }
         return type;
-    }
-
-    private double chooseRandomX(final double screenWidth) {
-        final boolean spawnLeft = random.nextBoolean();
-        if (spawnLeft) {
-            return random.nextDouble(MARGIN, (screenWidth / 2) - CENTRAL_OFFSET);
-        } else {
-            return random.nextDouble((screenWidth / 2) + CENTRAL_OFFSET, screenWidth - MARGIN);
-        }
-    }
-
-    private boolean isOnLeftSide(final double position, final double screenWidth) {
-        return position < screenWidth / 2;
-    }
-
-    private double chooseRandomAngle(final boolean left) {
-        final double angle = random.nextDouble(15, 75);
-        return left ? Math.toRadians(angle) : Math.toRadians(180 - angle);
-    }
-
-    private XY<Double> chooseVelocity(
-        final double angle, final double startingX, final double screenWidth, final double screenHeight
-    ) {
-        final double distanceToEdge = isOnLeftSide(startingX, screenWidth)
-            ? (screenWidth - startingX)
-            : startingX;
-
-        final double maxXVelocity = distanceToEdge / Math.abs(Math.cos(angle));
-
-        final double maxYVelocity = Math.sqrt(2 * PhysicsImpl.GRAVITY * (screenHeight * 0.8)) / Math.sin(angle);
-
-        final double maxVelocity = Math.min(maxXVelocity, maxYVelocity);
-
-        double minVelocity = Math.sqrt(PhysicsImpl.GRAVITY * (screenHeight * 0.5)) / Math.sin(angle);
-
-        if (minVelocity >= maxVelocity) {
-            minVelocity = maxVelocity * 0.8;
-        }
-
-        final double finalVelocity = random.nextDouble(minVelocity, maxVelocity);
-
-        return new XY<>(Math.cos(angle) * finalVelocity, -Math.sin(angle) * finalVelocity);
     }
 }

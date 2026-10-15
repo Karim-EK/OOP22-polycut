@@ -102,10 +102,12 @@ public class SliceableModelImpl implements SliceableModel {
     }
     
     /**
-     * TODO.
+     * The sliceable is out only when it is falling and completely below the bottom edge:
+     * at spawn time it is below the edge too, but it is going up.
      */
     @Override
-    public boolean isOutOfBound(double worldHeight) {
-        return (this.getPosition().y() - this.getApothem()) > worldHeight;
+    public boolean isOutOfBound(final double worldHeight) {
+        final boolean falling = this.getVelocity().y() > 0;
+        return falling && (this.getPosition().y() - RADIUS) > worldHeight;
     }
 }

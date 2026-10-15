@@ -1,18 +1,20 @@
 package mvc.view.impl;
 
+import static mvc.view.impl.GameAreaHelper.colorOf;
 import static mvc.view.impl.GameAreaHelper.createPolygon;
-import static mvc.view.impl.GameAreaHelper.drawCenteredOval;
+import static mvc.view.impl.GameAreaHelper.drawPowerUp;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -20,6 +22,7 @@ import javax.swing.JPanel;
 import mvc.controller.api.GameWorldController;
 import mvc.model.api.GameWorld;
 import mvc.model.api.PowerUpEnum;
+import mvc.model.api.PowerUpModel;
 import mvc.model.api.SliceableModel;
 import mvc.model.api.SliceableTypeEnum;
 import mvc.model.api.XY;
@@ -29,7 +32,8 @@ import mvc.view.api.GameAreaPanel;
 public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
 
     private Optional<Image> background = Optional.empty();
-    
+    private Optional<Image> bombImage = Optional.empty();
+
     private Image image1L;
     private Image image2L;
     private Image image3L;
@@ -38,16 +42,18 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
     private final URL url1L = getClass().getResource("/GraphicElements/heart.png");
     private final URL url2L = getClass().getResource("/GraphicElements/2hearts.png");
     private final URL url3L = getClass().getResource("/GraphicElements/3hearts.png");
-    
+    private final URL urlBomb = getClass().getResource("/GraphicElements/bomb.png");
+
     private int livesCounter;
     private GameWorldController controller;
-    private final Predicate<SliceableModel> circlePredicate = s -> 
-        s.getType() == SliceableTypeEnum.POWERUP || s.getType() == SliceableTypeEnum.BOMB;
     private Optional<XY<Double>> previousMousePosition = Optional.empty();
 
     public GameAreaPanelImpl(GameWorldController controller) {
         this.controller = controller;
         this.livesCounter = controller.getLives();
+        if (urlBomb != null) {
+            this.bombImage = Optional.of(new ImageIcon(urlBomb).getImage());
+        }
 
         try {
             if (urlBg == null) throw new IllegalStateException("impossible to load background");
@@ -120,22 +126,34 @@ public class GameAreaPanelImpl extends JPanel implements GameAreaPanel {
 
         livesImage.ifPresent(img -> g.drawImage(img, 0, 0, this));
 
-        //TODO: SWICH COLORI
-        g.setColor(Color.RED);
-        
+        final Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         for (final SliceableModel s : visibleSliceables) {
-            if (circlePredicate.test(s)) {
-                System.out.println("Frame disegnato. Elementi su schermo: " + visibleSliceables.size());
-                drawCenteredOval(g, s.getPosition(), s.getApothem(), scaleX, scaleY);
+            if (s.getType() == SliceableTypeEnum.BOMB || s.getType() == SliceableTypeEnum.POWERUP) {
+                // Bombe e power-up sono cerchi: si disegnano in pixel con un raggio unico
+                final int cx = (int) Math.round(s.getPosition().x() * scaleX);
+                final int cy = (int) Math.round(s.getPosition().y() * scaleY);
+                final int r = (int) Math.round(s.getApothem() * Math.min(scaleX, scaleY));
+                if (s instanceof PowerUpModel powerUp) {
+                    drawPowerUp(g2, powerUp.getPowerUp(), cx, cy, r);
+                } else {
+                    drawBomb(g2, cx, cy, r);
+                }
             } else {
                 final Polygon p = createPolygon(s.getType(), s.getPosition(), s.getApothem(), scaleX, scaleY);
-                System.out.println("Poligono: " + s.getType() + 
-                           " | Pos Logica: " + s.getPosition() + 
-                           " | Coordinate Pixel: x=" + p.getBounds().x + ", y=" + p.getBounds().y + 
-                           " | Dimensione Pixel: " + p.getBounds().width + "x" + p.getBounds().height);
-                g.drawPolygon(p);
-                g.fillPolygon(p);
+                g2.setColor(colorOf(s.getType()));
+                g2.fillPolygon(p);
             }
+        }
+    }
+
+    private void drawBomb(final Graphics2D g, final int cx, final int cy, final int r) {
+        if (this.bombImage.isPresent()) {
+            g.drawImage(this.bombImage.get(), cx - r, cy - r, 2 * r, 2 * r, this);
+        } else {
+            g.setColor(Color.BLACK);
+            g.fillOval(cx - r, cy - r, 2 * r, 2 * r);
         }
     }
 
